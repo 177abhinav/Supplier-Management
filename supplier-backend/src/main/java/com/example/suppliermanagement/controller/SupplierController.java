@@ -2,7 +2,9 @@
 
 package com.example.suppliermanagement.controller;
 
+import com.example.suppliermanagement.model.Approver;
 import com.example.suppliermanagement.model.Supplier;
+import com.example.suppliermanagement.repository.ApproverRepository;
 import com.example.suppliermanagement.repository.SupplierRepository;
 import com.example.suppliermanagement.service.ExcelService;
 
@@ -17,11 +19,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173") // Allow frontend
+@CrossOrigin(origins = "http://localhost:5174") // Allow frontend
 public class SupplierController {
 
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private ApproverRepository approverRepository; // ← Add this line
 
     @Autowired
     private ExcelService excelService;
@@ -51,6 +56,8 @@ public class SupplierController {
     @GetMapping("/download-excel")
     public void downloadExcel(HttpServletResponse response) throws IOException {
         List<Supplier> suppliers = supplierRepository.findAll();
-        excelService.generateExcelWithSuppliersAndApprovers(suppliers, response);
+        List<Approver> approvers = approverRepository.findAll(); // ← Add this line
+
+    excelService.generateExcelWithSuppliersAndApprovers(suppliers, approvers, response); // ← Pass both
     }
 }

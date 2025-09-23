@@ -1,6 +1,7 @@
+// src/components/common/Header.jsx
 import React from 'react';
 
-const Header = ({ onShowApprovers, onDownloadExcel }) => {
+const Header = ({ onShowApprovers, onDownloadExcel, onShowSuppliers }) => {
   return (
     <header className="bg-blue-200 py-6 px-8 shadow-md flex items-center justify-between" style={{ minHeight: '80px' }}>
       <h1 className="text-2xl font-bold text-gray-800">Supplier Management</h1>
@@ -18,7 +19,7 @@ const Header = ({ onShowApprovers, onDownloadExcel }) => {
           Show Approvers
         </button>
         <button
-          onClick={() => window.open("/suppliers", "_blank")} // ✅ opens in new tab
+          onClick={onShowSuppliers}  
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-300 shadow"
         >
           Show Suppliers

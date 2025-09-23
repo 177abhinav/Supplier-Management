@@ -2,96 +2,131 @@
 
 package com.example.suppliermanagement.service;
 
+import com.example.suppliermanagement.model.Approver;
 import com.example.suppliermanagement.model.Supplier;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
 public class ExcelService {
 
-    // Static approvers (as defined in your React code)
-    private static final List<Approver> STATIC_APPROVERS = List.of(
-        new Approver("Rajasekhar", "rkirlampudi@answerthink.com", 1, "India"),
-        new Approver("kumaresh", "kumaresh.ramadoss@answerthink.com", 1, "Canada")
-    );
+    public void generateExcelWithSuppliersAndApprovers(
+            List<Supplier> suppliers,
+            List<Approver> approvers,  // ← Accept both lists
+            HttpServletResponse response) throws IOException {
 
-    public void generateExcelWithSuppliersAndApprovers(List<Supplier> suppliers, HttpServletResponse response) throws IOException {
+        // Create new workbook
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Suppliers & Approvers");
 
-        // Create header row
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {
-            "Supplier Name", "Contact First Name", "Contact Last Name", "Email", "Phone",
-            "City", "Country", "Category", "Status",
-            "Approver Name", "Approver Email", "Approver Level", "Approver Country"
+        // ========================
+        // 📄 SHEET 1: Suppliers
+        // ========================
+        Sheet supplierSheet = workbook.createSheet("Suppliers");
+
+        // Create header row for Suppliers
+        Row supplierHeader = supplierSheet.createRow(0);
+        String[] supplierColumns = {
+            "ID", "Supplier Name", "Street", "Line2", "Line3", "City", "Postal Code",
+            "Country", "Region", "First Name", "Last Name", "Email", "Phone",
+            "Category", "Info Region", "Additional Info"
         };
 
-        CellStyle headerStyle = workbook.createCellStyle();
-        Font headerFont = workbook.createFont();
-        headerFont.setBold(true);
-        headerFont.setFontHeightInPoints((short) 12);
-        headerStyle.setFont(headerFont);
-        headerStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
-        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
+        for (int i = 0; i < supplierColumns.length; i++) {
+            Cell cell = supplierHeader.createCell(i);
+            cell.setCellValue(supplierColumns[i]);
+            // Optional: style header
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font font = workbook.createFont();
+            font.setBold(true);
+            headerStyle.setFont(font);
             cell.setCellStyle(headerStyle);
         }
 
-        // Write supplier data + approvers (each supplier repeated for each approver)
-        int rowNum = 1;
-        for (Supplier supplier : suppliers) {
-            for (Approver approver : STATIC_APPROVERS) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(supplier.getSupplierName() != null ? supplier.getSupplierName() : "");
-                row.createCell(1).setCellValue(supplier.getFirstName() != null ? supplier.getFirstName() : "");
-                row.createCell(2).setCellValue(supplier.getLastName() != null ? supplier.getLastName() : "");
-                row.createCell(3).setCellValue(supplier.getEmail() != null ? supplier.getEmail() : "");
-
-
-
-                // Add approver info
-                row.createCell(9).setCellValue(approver.name);
-                row.createCell(10).setCellValue(approver.email);
-                row.createCell(11).setCellValue(approver.level);
-                row.createCell(12).setCellValue(approver.country);
-            }
+        // Fill data rows for Suppliers
+        int supplierRowIndex = 1;
+        for (Supplier s : suppliers) {
+            Row row = supplierSheet.createRow(supplierRowIndex++);
+            row.createCell(0).setCellValue(s.getId() != null ? s.getId() : 0L);
+            row.createCell(1).setCellValue(s.getSupplierName() != null ? s.getSupplierName() : "");
+            row.createCell(2).setCellValue(s.getStreet() != null ? s.getStreet() : "");
+            row.createCell(3).setCellValue(s.getLine2() != null ? s.getLine2() : "");
+            row.createCell(4).setCellValue(s.getLine3() != null ? s.getLine3() : "");
+            row.createCell(5).setCellValue(s.getCity() != null ? s.getCity() : "");
+            row.createCell(6).setCellValue(s.getPostalCode() != null ? s.getPostalCode() : "");
+            row.createCell(7).setCellValue(s.getCountry() != null ? s.getCountry() : "");
+            row.createCell(8).setCellValue(s.getRegion() != null ? s.getRegion() : "");
+            row.createCell(9).setCellValue(s.getFirstName() != null ? s.getFirstName() : "");
+            row.createCell(10).setCellValue(s.getLastName() != null ? s.getLastName() : "");
+            row.createCell(11).setCellValue(s.getEmail() != null ? s.getEmail() : ""); // Uses @JsonProperty("email")
+            row.createCell(12).setCellValue(s.getPhone() != null ? s.getPhone() : "");   // Uses @JsonProperty("phone")
+            row.createCell(13).setCellValue(s.getCategory() != null ? s.getCategory() : "");
+            row.createCell(14).setCellValue(s.getInfoRegion() != null ? s.getInfoRegion() : "");
+            row.createCell(15).setCellValue(s.getAdditionalInfo() != null ? s.getAdditionalInfo() : "");
         }
 
-        // Auto-size columns
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
+        // Auto-size columns for Suppliers sheet
+        for (int i = 0; i < supplierColumns.length; i++) {
+            supplierSheet.autoSizeColumn(i);
         }
+
+        // ========================
+        // 📄 SHEET 2: Approvers
+        // ========================
+        Sheet approverSheet = workbook.createSheet("Approvers");
+
+        // Create header row for Approvers
+        Row approverHeader = approverSheet.createRow(0);
+        String[] approverColumns = {
+            "ID", "Name", "Email", "Level", "Country"
+        };
+
+        for (int i = 0; i < approverColumns.length; i++) {
+            Cell cell = approverHeader.createCell(i);
+            cell.setCellValue(approverColumns[i]);
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font font = workbook.createFont();
+            font.setBold(true);
+            headerStyle.setFont(font);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Fill data rows for Approvers
+        int approverRowIndex = 1;
+        for (Approver a : approvers) {
+            Row row = approverSheet.createRow(approverRowIndex++);
+            row.createCell(0).setCellValue(a.getId() != null ? a.getId() : 0L);
+            row.createCell(1).setCellValue(a.getName() != null ? a.getName() : "");
+            row.createCell(2).setCellValue(a.getEmail() != null ? a.getEmail() : "");
+            row.createCell(3).setCellValue(a.getLevel() != null ? a.getLevel() : 0);
+            row.createCell(4).setCellValue(a.getCountry() != null ? a.getCountry() : "");
+        }
+
+        // Auto-size columns for Approvers sheet
+        for (int i = 0; i < approverColumns.length; i++) {
+            approverSheet.autoSizeColumn(i);
+        }
+
+        // ========================
+        // 📤 FINAL: Write to Response
+        // ========================
+
+        // Generate filename with timestamp
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String filename = "Suppliers_And_Approvers_" + timestamp + ".xlsx";
 
         // Set response headers
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=suppliers_with_approvers.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
-        // Write to output stream
+        // Write workbook to output stream
         workbook.write(response.getOutputStream());
         workbook.close();
-    }
-
-    // Inner class to hold approver data
-    public static class Approver {
-        public String name;
-        public String email;
-        public int level;
-        public String country;
-
-        public Approver(String name, String email, int level, String country) {
-            this.name = name;
-            this.email = email;
-            this.level = level;
-            this.country = country;
-        }
     }
 }

@@ -1,19 +1,20 @@
 // src/components/SuppliersListPage.jsx
 import React, { useState, useEffect } from 'react';
+import SupplierDetailModal from './SupplierDetailModal'; // ✅ Import the modal
 import { useNavigate } from 'react-router-dom';
 
 const SuppliersListPage = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedSupplierId, setSelectedSupplierId] = useState(null); // ✅ For modal
+  const navigate = useNavigate();
 
   const [filters, setFilters] = useState({
     name: '',
     city: '',
     status: '',
   });
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -53,6 +54,24 @@ const SuppliersListPage = () => {
       status: '',
     });
   };
+
+  // ✅ Modal handlers
+  const openModal = (id) => {
+    setSelectedSupplierId(id);
+  };
+
+  const closeModal = () => {
+    setSelectedSupplierId(null);
+  };
+
+  // ✅ ESC key to close modal
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, []);
 
   if (loading) {
     return (
@@ -94,15 +113,31 @@ const SuppliersListPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
-        
-        {/* 👉 Hero Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-gray-800">
-            Suppliers
-          </h1>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mt-3"></div>
-        </div>
 
+        {/* 👉 Hero Header — Back Button aligned left with Title */}
+        <div className="mb-8 flex flex-wrap items-center gap-4">
+          {/* Back Button */}
+          <button
+            onClick={() => {
+              navigate('/');
+              window.scrollTo(0, 0);
+            }}
+            className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-lg flex items-center transition-colors duration-200 shadow-sm"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Main
+          </button>
+
+          {/* Title Section — now inline */}
+          <div className="flex flex-col">
+            <h1 className="text-4xl font-extrabold text-gray-800 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-gray-800">
+              Suppliers
+            </h1>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mt-1"></div>
+          </div>
+        </div>
         {/* 👉 Filters Card — Glassmorphism Style */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200 p-6 mb-10 transition-all duration-300 hover:shadow-2xl">
           <h3 className="text-lg font-bold text-gray-800 mb-5 flex items-center">
@@ -235,7 +270,7 @@ const SuppliersListPage = () => {
                     <tr
                       key={idx}
                       className="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5"
-                      onClick={() => navigate(`/suppliers/${s.id}`)}
+                      onClick={() => openModal(s.id)} // ✅ Open modal on row click
                     >
                       <td className="px-8 py-6 text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
                         {s.supplierName}
@@ -250,20 +285,19 @@ const SuppliersListPage = () => {
                         {s.city || '—'}
                       </td>
                       <td className="px-8 py-6">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                          s.status === 'Active' ? 'bg-green-100 text-green-800' :
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${s.status === 'Active' ? 'bg-green-100 text-green-800' :
                           s.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                          s.status === 'Rejected' ? 'bg-red-100 text-red-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                            s.status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                          }`}>
                           {s.status || 'Unknown'}
                         </span>
                       </td>
                       <td className="px-8 py-6">
                         <button
                           onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/suppliers/${s.id}`);
+                            e.stopPropagation(); // ✅ Prevent row click
+                            openModal(s.id); // ✅ Open modal
                           }}
                           className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 transform hover:scale-105 transition-all duration-200 shadow-sm hover:shadow"
                         >
@@ -277,6 +311,14 @@ const SuppliersListPage = () => {
             </div>
           )}
         </div>
+
+        {/* ✅ MODAL */}
+        {selectedSupplierId && (
+          <SupplierDetailModal
+            supplierId={selectedSupplierId}
+            onClose={closeModal}
+          />
+        )}
       </div>
     </div>
   );

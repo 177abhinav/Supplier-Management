@@ -1,3 +1,4 @@
+// src/components/common/StepIndicator.jsx
 import React from 'react';
 
 const StepIndicator = ({ step, title, active }) => {
@@ -6,7 +7,10 @@ const StepIndicator = ({ step, title, active }) => {
       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors duration-300 ${active ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'}`}>
         {step}
       </div>
-      <span className="text-sm md:text-base font-medium whitespace-nowrap hidden sm:block">{title}</span>
+      {/* ✅ Removed "hidden sm:block" — always show title */}
+      <span className="text-sm md:text-base font-medium whitespace-nowrap">
+        {title}
+      </span>
     </div>
   );
 };

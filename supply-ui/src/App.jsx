@@ -1,9 +1,8 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/common/Header';
 import SuppliersPage from './components/SuppliersListPage';
-import StepIndicator from './components/common/StepIndicator';
 import ApproverListModal from './components/common/ApproverListModal';
 import SupplierDetailsForm from './components/formSteps/SupplierDetailsForm';
 import ContactDetailsForm from './components/formSteps/ContactDetailsForm';
@@ -11,20 +10,46 @@ import CategoryAndInfoForm from './components/formSteps/CategoryAndInfoForm';
 import UploadAttachmentsForm from './components/formSteps/UploadAttachmentsForm';
 import ReviewAndSubmitForm from './components/formSteps/ReviewAndSubmitForm';
 import SupplierDetailPage from './components/SupplierDetailPage';
+// ✅ Import TopStepProgress (top visual bar)
+import TopStepProgress from './components/common/TopStepProgress';
+// ✅ Import StepNavigator (bottom navigation bar)
+import StepNavigator from './components/common/StepNavigator';
 
 const App = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showApproverModal, setShowApproverModal] = useState(false);
   const [formData, setFormData] = useState({});
   const [formErrors, setFormErrors] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     setFormData({
-      supplierName: '', street: '', line2: '', line3: '', city: '',
-      postalCode: '', country: '', region: '', firstName: '', lastName: '',
-      email: '', phone: '', category: '', infoRegion: '', additionalInfo: '',
+      supplierName: '',
+      street: '',
+      line2: '',
+      line3: '',
+      city: '',
+      postalCode: '',
+      country: '',
+      region: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      category: '',
+      infoRegion: '',
+      additionalInfo: '',
+      attachments: []
     });
   }, []);
+
+  // ✅ Handler to jump to a specific step (only completed/past steps allowed)
+  const goToStep = (step) => {
+    if (step >= 1 && step <= currentStep) {
+      setCurrentStep(step);
+      setFormErrors({}); // Clear errors when navigating
+    }
+  };
 
   const handleNextStep = () => {
     const hasErrors = validateStep(currentStep);
@@ -42,23 +67,47 @@ const App = () => {
     let hasErrors = false;
     switch (step) {
       case 1:
-        if (!formData.supplierName) { errors.supplierName = "Supplier Name is required."; hasErrors = true; }
-        if (!formData.country) { errors.country = "Country is required."; hasErrors = true; }
+        if (!formData.supplierName) {
+          errors.supplierName = 'Supplier Name is required.';
+          hasErrors = true;
+        }
+        if (!formData.country) {
+          errors.country = 'Country is required.';
+          hasErrors = true;
+        }
         break;
       case 2:
-        if (!formData.firstName) { errors.firstName = "First Name is required."; hasErrors = true; }
-        if (!formData.lastName) { errors.lastName = "Last Name is required."; hasErrors = true; }
+        if (!formData.firstName) {
+          errors.firstName = 'First Name is required.';
+          hasErrors = true;
+        }
+        if (!formData.lastName) {
+          errors.lastName = 'Last Name is required.';
+          hasErrors = true;
+        }
         if (!formData.email) {
-          errors.email = "Email is required."; hasErrors = true;
+          errors.email = 'Email is required.';
+          hasErrors = true;
         } else {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (!emailRegex.test(formData.email)) {
-            errors.email = "Please enter a valid email address."; hasErrors = true;
+            errors.email = 'Please enter a valid email address.';
+            hasErrors = true;
           }
         }
         break;
       case 3:
-        if (!formData.category) { errors.category = "Category is required."; hasErrors = true; }
+        if (!formData.category) {
+          errors.category = 'Category is required.';
+          hasErrors = true;
+        }
+        break;
+      // ✅ NEW: Validate Step 4 — Attachments Required
+      case 4:
+        if (!formData.attachments || formData.attachments.length === 0) {
+          errors.attachments = 'At least one attachment is required.';
+          hasErrors = true;
+        }
         break;
       default:
         break;
@@ -69,12 +118,12 @@ const App = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
       [name]: value
     }));
     if (formErrors[name]) {
-      setFormErrors(prevErrors => ({ ...prevErrors, [name]: '' }));
+      setFormErrors((prevErrors) => ({ ...prevErrors, [name]: '' }));
     }
   };
 
@@ -103,27 +152,91 @@ const App = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
-      .then(res => res.ok ? alert('Form submitted successfully!') : alert('Submission failed'))
+      .then((res) => {
+        if (res.ok) {
+          alert('Form submitted successfully!');
+          // ✅ Reset form and go to Step 1
+          setFormData({
+            supplierName: '',
+            street: '',
+            line2: '',
+            line3: '',
+            city: '',
+            postalCode: '',
+            country: '',
+            region: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            category: '',
+            infoRegion: '',
+            additionalInfo: '',
+            attachments: []
+          });
+          setCurrentStep(1); // ✅ Go back to Step 1
+          setFormErrors({});
+        } else {
+          alert('Submission failed');
+        }
+      })
       .catch(() => alert('Error connecting to backend'));
   };
 
   const renderFormContent = () => {
     switch (currentStep) {
       case 1:
-        return <SupplierDetailsForm formData={formData} handleChange={handleChange} formErrors={formErrors} onNext={handleNextStep} />;
+        return (
+          <SupplierDetailsForm
+            formData={formData}
+            handleChange={handleChange}
+            formErrors={formErrors}
+            onNext={handleNextStep}
+            goToStep={goToStep}
+          />
+        );
       case 2:
-        return <ContactDetailsForm formData={formData} handleChange={handleChange} formErrors={formErrors} onNext={handleNextStep} onBack={handleBackStep} />;
+        return (
+          <ContactDetailsForm
+            formData={formData}
+            handleChange={handleChange}
+            formErrors={formErrors}
+            onNext={handleNextStep}
+            onBack={handleBackStep}
+            goToStep={goToStep}
+          />
+        );
       case 3:
-        return <CategoryAndInfoForm formData={formData} handleChange={handleChange} formErrors={formErrors} onNext={handleNextStep} onBack={handleBackStep} />;
+        return (
+          <CategoryAndInfoForm
+            formData={formData}
+            handleChange={handleChange}
+            formErrors={formErrors}
+            onNext={handleNextStep}
+            onBack={handleBackStep}
+            goToStep={goToStep}
+          />
+        );
       case 4:
-        return <UploadAttachmentsForm
-          attachments={formData.attachments || []}
-          setAttachments={files => setFormData(prev => ({ ...prev, attachments: files }))}
-          onNext={handleNextStep}
-          onBack={handleBackStep}
-        />;
+        return (
+          <UploadAttachmentsForm
+            attachments={formData.attachments || []}
+            setAttachments={(files) => setFormData((prev) => ({ ...prev, attachments: files }))}
+            onNext={handleNextStep}
+            onBack={handleBackStep}
+            goToStep={goToStep}
+            error={formErrors.attachments}
+          />
+        );
       case 5:
-        return <ReviewAndSubmitForm formData={formData} onBack={handleBackStep} onSubmit={handleSubmit} />;
+        return (
+          <ReviewAndSubmitForm
+            formData={formData}
+            onBack={handleBackStep}
+            onSubmit={handleSubmit}
+            goToStep={goToStep}
+          />
+        );
       default:
         return null;
     }
@@ -132,63 +245,66 @@ const App = () => {
   return (
     <div className="min-h-screen bg-gray-100 font-sans text-gray-800">
       <Routes>
-  {/* 👉 Main Form Wizard Route */}
-  <Route
-    path="/"
-    element={
-      <>
-        <Header
-          onShowApprovers={() => setShowApproverModal(true)}
-          onShowSuppliers={() => window.open("/suppliers", "_blank")}
-          onDownloadExcel={() => {
-                // Trigger file download from backend
-    window.location.href = 'http://localhost:8080/api/download-excel';
-          }}
+        {/* 👉 Main Form Wizard Route */}
+        <Route
+          path="/"
+          element={
+            <>
+              <Header
+                onShowApprovers={() => setShowApproverModal(true)}
+                onShowSuppliers={() => navigate('/suppliers')}
+                onDownloadExcel={() => {
+                  window.location.href = 'http://localhost:8080/api/download-excel';
+                }}
+              />
+              <div className="p-4 md:p-8 lg:p-12">
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  {/* ✅ TOP: Visual Progress Bar */}
+                  <TopStepProgress currentStep={currentStep} goToStep={goToStep} />
+
+                  {/* ✅ MIDDLE: Form Content */}
+                  {renderFormContent()}
+
+                  {/* ✅ BOTTOM: Navigation Buttons (Back / Next / Submit) */}
+                  <StepNavigator
+                    currentStep={currentStep}
+                    totalSteps={5}
+                    onBack={handleBackStep}
+                    onNext={handleNextStep}
+                    onSubmit={handleSubmit}
+                    goToStep={goToStep}
+                    isFirstStep={currentStep === 1}
+                    isLastStep={currentStep === 5}
+                  />
+                </div>
+              </div>
+              {showApproverModal && <ApproverListModal onClose={() => setShowApproverModal(false)} />}
+            </>
+          }
         />
-        <div className="p-4 md:p-8 lg:p-12">
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex items-center justify-between mb-8 overflow-x-auto whitespace-nowrap">
-              <StepIndicator step={1} title="Supplier Details" active={currentStep >= 1} />
-              <div className={`flex-grow h-2 mx-4 rounded transition-colors duration-300 ${currentStep > 1 ? 'bg-blue-700' : 'bg-blue-200'}`}></div>
-              <StepIndicator step={2} title="Contact Details" active={currentStep >= 2} />
-              <div className={`flex-grow h-2 mx-4 rounded transition-colors duration-300 ${currentStep > 2 ? 'bg-blue-700' : 'bg-blue-200'}`}></div>
-              <StepIndicator step={3} title="Category and Additional Info" active={currentStep >= 3} />
-              <div className={`flex-grow h-2 mx-4 rounded transition-colors duration-300 ${currentStep > 3 ? 'bg-blue-700' : 'bg-blue-200'}`}></div>
-              <StepIndicator step={4} title="Upload Attachments" active={currentStep >= 4} />
-              <div className={`flex-grow h-2 mx-4 rounded transition-colors duration-300 ${currentStep > 4 ? 'bg-blue-700' : 'bg-blue-200'}`}></div>
-              <StepIndicator step={5} title="Review & Submit" active={currentStep >= 5} />
+
+        {/* ✅ Suppliers LIST Page */}
+        <Route
+          path="/suppliers"
+          element={
+            <div className="min-h-screen bg-gray-100 font-sans text-gray-800 p-4 md:p-8">
+              <SuppliersPage />
             </div>
-            {renderFormContent()}
-          </div>
-        </div>
-        {showApproverModal && <ApproverListModal onClose={() => setShowApproverModal(false)} />}
-      </>
-    }
-  />
+          }
+        />
 
-  {/* ✅ 👉 Suppliers LIST Page */}
-  <Route
-  path="/suppliers"
-  element={
-    <div className="min-h-screen bg-gray-100 font-sans text-gray-800 p-4 md:p-8">
-      {/* ✅ NO HEADER HERE — clean, focused suppliers list */}
-      <SuppliersPage />
-    </div>
-  }
-/>
-
-  {/* ✅ 👉 Supplier DETAIL Page */}
-  <Route
-    path="/suppliers/:id"
-    element={
-      <div className="min-h-screen bg-gray-100 font-sans text-gray-800 p-4 md:p-8">
-        <div className="mt-8">
-          <SupplierDetailPage />
-        </div>
-      </div>
-    }
-  />
-</Routes>
+        {/* ✅ Supplier DETAIL Page */}
+        <Route
+          path="/suppliers/:id"
+          element={
+            <div className="min-h-screen bg-gray-100 font-sans text-gray-800 p-4 md:p-8">
+              <div className="mt-8">
+                <SupplierDetailPage />
+              </div>
+            </div>
+          }
+        />
+      </Routes>
     </div>
   );
 };
