@@ -1,3 +1,4 @@
+// src/components/formSteps/ReviewAndSubmitForm.jsx
 import React from 'react';
 import StepNavigator from '../common/StepNavigator';
 
@@ -21,13 +22,15 @@ const ReviewAndSubmitForm = ({ formData, onBack, onSubmit, goToStep }) => {
           </h3>
           <div className="mt-2 text-gray-700 grid grid-cols-2 gap-x-6 gap-y-1">
             <div className="flex"><span className="font-medium w-40">Supplier Name:</span><span>{formData.supplierName}</span></div>
-            <div className="flex"><span className="font-medium w-40">Street:</span><span>{formData.street}</span></div>
-            <div className="flex"><span className="font-medium w-40">Line2:</span><span>{formData.line2}</span></div>
-            <div className="flex"><span className="font-medium w-40">Line3:</span><span>{formData.line3}</span></div>
-            <div className="flex"><span className="font-medium w-40">City:</span><span>{formData.city}</span></div>
-            <div className="flex"><span className="font-medium w-40">PostalCode:</span><span>{formData.postalCode}</span></div>
-            <div className="flex"><span className="font-medium w-40">Country:</span><span>{formData.country}</span></div>
-            <div className="flex"><span className="font-medium w-40">Region:</span><span>{formData.region}</span></div>
+            <div className="flex"><span className="font-medium w-40">Business Partner ID:</span><span>{formData.businessPartnerId || '—'}</span></div>
+            <div className="flex"><span className="font-medium w-40">Status:</span><span>{formData.status}</span></div>
+            <div className="flex"><span className="font-medium w-40">Street:</span><span>{formData.mainAddress.street}</span></div>
+            <div className="flex"><span className="font-medium w-40">Line2:</span><span>{formData.mainAddress.line2}</span></div>
+            <div className="flex"><span className="font-medium w-40">Line3:</span><span>{formData.mainAddress.line3}</span></div>
+            <div className="flex"><span className="font-medium w-40">City:</span><span>{formData.mainAddress.city}</span></div>
+            <div className="flex"><span className="font-medium w-40">Postal Code:</span><span>{formData.mainAddress.postalCode}</span></div>
+            <div className="flex"><span className="font-medium w-40">Country:</span><span>{formData.mainAddress.country}</span></div>
+            <div className="flex"><span className="font-medium w-40">Region:</span><span>{formData.mainAddress.region}</span></div>
           </div>
         </div>
 
@@ -44,12 +47,49 @@ const ReviewAndSubmitForm = ({ formData, onBack, onSubmit, goToStep }) => {
             Contact Details
           </h3>
           <div className="mt-2 text-gray-700 grid grid-cols-2 gap-x-6 gap-y-1">
-            <div className="flex"><span className="font-medium w-40">First Name:</span><span>{formData.firstName}</span></div>
-            <div className="flex"><span className="font-medium w-40">Last Name:</span><span>{formData.lastName}</span></div>
-            <div className="flex"><span className="font-medium w-40">Email:</span><span>{formData.email}</span></div>
-            <div className="flex"><span className="font-medium w-40">Phone:</span><span>{formData.phone}</span></div>
+            <div className="flex"><span className="font-medium w-40">First Name:</span><span>{formData.primaryContact.firstName}</span></div>
+            <div className="flex"><span className="font-medium w-40">Last Name:</span><span>{formData.primaryContact.lastName}</span></div>
+            <div className="flex"><span className="font-medium w-40">Email:</span><span>{formData.primaryContact.email}</span></div>
+            <div className="flex"><span className="font-medium w-40">Phone:</span><span>{formData.primaryContact.phone}</span></div>
           </div>
         </div>
+
+        {/* Category & Region */}
+        <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">
+          <h3 className="flex items-center text-lg font-semibold text-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Category & Region
+          </h3>
+          <div className="mt-2 text-gray-700 grid grid-cols-2 gap-x-6 gap-y-1">
+            <div className="flex"><span className="font-medium w-40">Category:</span><span>{formData.categoryAndRegion.category}</span></div>
+            <div className="flex"><span className="font-medium w-40">Region:</span><span>{formData.categoryAndRegion.region}</span></div>
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        {formData.additionalInfo.details && (
+          <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">
+            <h3 className="flex items-center text-lg font-semibold text-gray-800">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Additional Information
+            </h3>
+            <div className="mt-2 text-gray-700">
+              <p>{formData.additionalInfo.details}</p>
+            </div>
+          </div>
+        )}
 
         {/* Uploaded Attachments */}
         <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">

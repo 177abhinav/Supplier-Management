@@ -35,7 +35,7 @@ const SuppliersListPage = () => {
 
   const filteredSuppliers = suppliers.filter(supplier => {
     const matchesName = supplier.supplierName.toLowerCase().includes(filters.name.toLowerCase());
-    const matchesCity = (supplier.city || '').toLowerCase().includes(filters.city.toLowerCase());
+    const matchesCity = (supplier.mainAddress?.city || '').toLowerCase().includes(filters.city.toLowerCase());
     const matchesStatus = (supplier.status || '').toLowerCase().includes(filters.status.toLowerCase());
     return matchesName && matchesCity && matchesStatus;
   });
@@ -270,19 +270,19 @@ const SuppliersListPage = () => {
                     <tr
                       key={idx}
                       className="group hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-300 cursor-pointer transform hover:-translate-y-0.5"
-                      onClick={() => openModal(s.id)} // ✅ Open modal on row click
+                      onClick={() => openModal(s.ID)} // ✅ Use s.ID for SAP CDS
                     >
                       <td className="px-8 py-6 text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">
                         {s.supplierName}
                       </td>
                       <td className="px-8 py-6 text-sm text-gray-700">
-                        {`${s.firstName || ''} ${s.lastName || ''}`.trim() || '—'}
+                        {`${s.primaryContact?.firstName || ''} ${s.primaryContact?.lastName || ''}`.trim() || '—'}
                       </td>
                       <td className="px-8 py-6 text-sm text-blue-600 hover:text-blue-800 break-all">
-                        {s.email || '—'}
+                        {s.primaryContact?.email || '—'}
                       </td>
                       <td className="px-8 py-6 text-sm text-gray-600">
-                        {s.city || '—'}
+                        {s.mainAddress?.city || '—'}
                       </td>
                       <td className="px-8 py-6">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${s.status === 'Active' ? 'bg-green-100 text-green-800' :
@@ -297,7 +297,7 @@ const SuppliersListPage = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation(); // ✅ Prevent row click
-                            openModal(s.id); // ✅ Open modal
+                            openModal(s.ID); // ✅ Use s.ID for SAP CDS
                           }}
                           className="px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 transform hover:scale-105 transition-all duration-200 shadow-sm hover:shadow"
                         >

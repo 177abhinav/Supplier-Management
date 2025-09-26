@@ -1,7 +1,8 @@
+// src/components/formSteps/ContactDetailsForm.jsx
 import React from 'react';
 import StepNavigator from '../common/StepNavigator';
 
-const ContactDetailsForm = ({ formData, handleChange, formErrors, onNext, onBack, goToStep }) => {
+const ContactDetailsForm = ({ formData, handleContactChange, formErrors, onNext, onBack, goToStep }) => {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-700">2. Contact Details</h2>
@@ -12,9 +13,8 @@ const ContactDetailsForm = ({ formData, handleChange, formErrors, onNext, onBack
           </label>
           <input
             type="text"
-            name="firstName"
-            value={formData.firstName || ''}
-            onChange={handleChange}
+            value={formData.primaryContact.firstName || ''}
+            onChange={(e) => handleContactChange('firstName', e.target.value)}
             className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
               formErrors.firstName ? 'border-red-500' : 'border-gray-300'
             }`}
@@ -38,9 +38,8 @@ const ContactDetailsForm = ({ formData, handleChange, formErrors, onNext, onBack
           </label>
           <input
             type="text"
-            name="lastName"
-            value={formData.lastName || ''}
-            onChange={handleChange}
+            value={formData.primaryContact.lastName || ''}
+            onChange={(e) => handleContactChange('lastName', e.target.value)}
             className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
               formErrors.lastName ? 'border-red-500' : 'border-gray-300'
             }`}
@@ -64,9 +63,8 @@ const ContactDetailsForm = ({ formData, handleChange, formErrors, onNext, onBack
           </label>
           <input
             type="email"
-            name="email"
-            value={formData.email || ''}
-            onChange={handleChange}
+            value={formData.primaryContact.email || ''}
+            onChange={(e) => handleContactChange('email', e.target.value)}
             className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
               formErrors.email ? 'border-red-500' : 'border-gray-300'
             }`}
@@ -88,16 +86,12 @@ const ContactDetailsForm = ({ formData, handleChange, formErrors, onNext, onBack
           <label className="block text-sm font-medium text-gray-700">Phone:</label>
           <input
             type="tel"
-            name="phone"
-            value={formData.phone || ''}
-            onChange={handleChange}
+            value={formData.primaryContact.phone || ''}
+            onChange={(e) => handleContactChange('phone', e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
       </div>
-
-      {/* 👇 STEP NAVIGATOR */}
-    
     </div>
   );
 };

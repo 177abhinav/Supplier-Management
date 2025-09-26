@@ -1,7 +1,8 @@
+// src/components/formSteps/CategoryAndInfoForm.jsx
 import React from 'react';
 import StepNavigator from '../common/StepNavigator';
 
-const CategoryAndInfoForm = ({ formData, handleChange, formErrors, onNext, onBack, goToStep }) => {
+const CategoryAndInfoForm = ({ formData, handleCategoryChange, handleAdditionalInfoChange, formErrors, onNext, onBack, goToStep }) => {
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-gray-700">3. Category and Additional Info</h2>
@@ -12,9 +13,8 @@ const CategoryAndInfoForm = ({ formData, handleChange, formErrors, onNext, onBac
           </label>
           <input
             type="text"
-            name="category"
-            value={formData.category || ''}
-            onChange={handleChange}
+            value={formData.categoryAndRegion.category || ''}
+            onChange={(e) => handleCategoryChange('category', e.target.value)}
             className={`mt-1 block w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 ${
               formErrors.category ? 'border-red-500' : 'border-gray-300'
             }`}
@@ -36,25 +36,21 @@ const CategoryAndInfoForm = ({ formData, handleChange, formErrors, onNext, onBac
           <label className="block text-sm font-medium text-gray-700">Region:</label>
           <input
             type="text"
-            name="infoRegion"
-            value={formData.infoRegion || ''}
-            onChange={handleChange}
+            value={formData.categoryAndRegion.region || ''}
+            onChange={(e) => handleCategoryChange('region', e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700">Additional Info:</label>
           <textarea
-            name="additionalInfo"
-            value={formData.additionalInfo || ''}
-            onChange={handleChange}
+            value={formData.additionalInfo.details || ''}
+            onChange={(e) => handleAdditionalInfoChange(e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             rows="4"
           ></textarea>
         </div>
       </div>
-
-    
     </div>
   );
 };

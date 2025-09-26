@@ -6,20 +6,18 @@ const ApproverListModal = ({ onClose }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Form states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentApprover, setCurrentApprover] = useState(null);
 
-  // Form fields
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    level: 1,
+    level: '1',
     country: ''
   });
 
-  // Fetch approvers on load
+  // Fetch approvers on mount
   useEffect(() => {
     const fetchApprovers = async () => {
       try {
@@ -33,11 +31,30 @@ const ApproverListModal = ({ onClose }) => {
         setLoading(false);
       }
     };
-
     fetchApprovers();
   }, []);
 
-  // Handle Create
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'level' ? value.toString() : value
+    }));
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      level: '1',
+      country: ''
+    });
+    setCurrentApprover(null);
+  };
+
+  // Create approver
   const handleCreate = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/approvers', {
@@ -45,9 +62,7 @@ const ApproverListModal = ({ onClose }) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-
       if (!response.ok) throw new Error('Failed to create approver');
-
       const newApprover = await response.json();
       setApprovers(prev => [...prev, newApprover]);
       setIsCreateModalOpen(false);
@@ -57,15 +72,23 @@ const ApproverListModal = ({ onClose }) => {
     }
   };
 
-  // Handle Update
+  // Update approver
   const handleUpdate = async () => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/approvers/${currentApprover.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+    console.log('Current approver:', currentApprover);
+    if (!currentApprover?.id) {
+      alert('Approver ID is missing!');
+      return;
+    }
 
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/approvers/${currentApprover.id}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        }
+      );
       if (!response.ok) throw new Error('Failed to update approver');
 
       const updatedApprover = await response.json();
@@ -79,41 +102,23 @@ const ApproverListModal = ({ onClose }) => {
     }
   };
 
-  // Open Create Modal
+  // Open create modal
   const openCreateModal = () => {
     resetForm();
     setIsCreateModalOpen(true);
   };
 
-  // Open Edit Modal
+  // Open edit modal
   const openEditModal = (approver) => {
+    console.log('Approver data:', approver); // Debug: check what's being passed
     setCurrentApprover(approver);
     setFormData({
       name: approver.name,
       email: approver.email,
-      level: approver.level,
+      level: approver.level.toString(),
       country: approver.country
     });
     setIsEditModalOpen(true);
-  };
-
-  // Reset form
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      email: '',
-      level: 1,
-      country: ''
-    });
-  };
-
-  // Handle form input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'level' ? parseInt(value, 10) : value
-    }));
   };
 
   if (loading) {
@@ -126,45 +131,49 @@ const ApproverListModal = ({ onClose }) => {
     );
   }
 
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <>
-      {/* 👉 Main Approver List Modal */}
+      {/* Main Approver List Modal */}
       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center p-4 z-50">
-        <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-5xl"> {/* ✅ Wider modal */}
+        <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-5xl">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Approver List</h2>
+
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-gray-700">Approvers</h3>
-            <div className="space-x-2">
-              <button
-                onClick={openCreateModal}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-300 shadow"
-              >
-                Create Approver
-              </button>
-            </div>
+            <button
+              onClick={openCreateModal}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-300 shadow"
+            >
+              Create Approver
+            </button>
           </div>
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                  <th scope="col" className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                  <th className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                  <th className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                  <th className="px-8 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {approvers.map((approver) => (
                   <tr key={approver.id}>
                     <td className="px-8 py-4 whitespace-nowrap text-sm text-gray-900">{approver.name}</td>
-                    <td className="px-8 py-4 whitespace-nowrap text-sm text-gray-500 min-w-[240px]">{approver.email}</td> {/* ✅ Increased padding + min width */}
+                    <td className="px-8 py-4 whitespace-nowrap text-sm text-gray-500">{approver.email}</td>
                     <td className="px-8 py-4 whitespace-nowrap text-sm text-gray-500">{approver.level}</td>
                     <td className="px-8 py-4 whitespace-nowrap text-sm text-gray-500">{approver.country}</td>
                     <td className="px-8 py-4 whitespace-nowrap text-sm">
                       <button
                         onClick={() => openEditModal(approver)}
-                        className="text-blue-600 hover:text-blue-800 transition-colors duration-300 mr-2"
+                        className="text-blue-600 hover:text-blue-800 transition-colors duration-300"
                       >
                         Edit
                       </button>
@@ -174,6 +183,7 @@ const ApproverListModal = ({ onClose }) => {
               </tbody>
             </table>
           </div>
+
           <div className="mt-4 flex justify-end">
             <button
               onClick={onClose}
@@ -185,147 +195,68 @@ const ApproverListModal = ({ onClose }) => {
         </div>
       </div>
 
-      {/* 👉 Create Approver Modal */}
+      {/* Create Approver Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center p-4 z-50">
-          <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Create New Approver</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Name *</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Level *</label>
-                <input
-                  type="number"
-                  name="level"
-                  value={formData.level}
-                  onChange={handleChange}
-                  min="1"
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Country *</label>
-                <input
-                  type="text"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-            </div>
-            <div className="mt-6 flex space-x-3 justify-end">
-              <button
-                onClick={() => setIsCreateModalOpen(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold transition-colors duration-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreate}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-300"
-              >
-                Create
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalForm
+          title="Create New Approver"
+          formData={formData}
+          handleChange={handleChange}
+          onCancel={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreate}
+        />
       )}
 
-      {/* 👉 Edit Approver Modal */}
+      {/* Edit Approver Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-center p-4 z-50">
-          <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Edit Approver</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Name *</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Email *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Level *</label>
-                <input
-                  type="number"
-                  name="level"
-                  value={formData.level}
-                  onChange={handleChange}
-                  min="1"
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Country *</label>
-                <input
-                  type="text"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleChange}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  required
-                />
-              </div>
-            </div>
-            <div className="mt-6 flex space-x-3 justify-end">
-              <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold transition-colors duration-300"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-300"
-              >
-                Update
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalForm
+          title="Edit Approver"
+          formData={formData}
+          handleChange={handleChange}
+          onCancel={() => setIsEditModalOpen(false)}
+          onSubmit={handleUpdate}
+        />
       )}
     </>
   );
 };
+
+// Reusable modal form component
+const ModalForm = ({ title, formData, handleChange, onCancel, onSubmit }) => (
+  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 z-50">
+    <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+      <h3 className="text-lg font-bold text-gray-800 mb-4">{title}</h3>
+      <div className="space-y-4">
+        {['name', 'email', 'level', 'country'].map((field) => (
+          <div key={field}>
+            <label className="block text-sm font-medium text-gray-700">{field.charAt(0).toUpperCase() + field.slice(1)} *</label>
+            <input
+              type={field === 'level' ? 'number' : field === 'email' ? 'email' : 'text'}
+              name={field}
+              value={formData[field]}
+              onChange={handleChange}
+              min={field === 'level' ? 1 : undefined}
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
+            />
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 flex space-x-3 justify-end">
+        <button
+          onClick={onCancel}
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-semibold transition-colors duration-300"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={onSubmit}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors duration-300"
+        >
+          {title.includes('Edit') ? 'Update' : 'Create'}
+        </button>
+      </div>
+    </div>
+  </div>
+);
 
 export default ApproverListModal;
