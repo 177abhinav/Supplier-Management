@@ -33,15 +33,6 @@ const SupplierDetailsForm = ({ formData, handleChange, handleAddressChange, form
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Business Partner ID:</label>
-          <input
-            type="text"
-            value={formData.businessPartnerId || ''}
-            onChange={(e) => handleChange('businessPartnerId', e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-        <div>
           <label className="block text-sm font-medium text-gray-700">Street:</label>
           <input
             type="text"
@@ -119,18 +110,6 @@ const SupplierDetailsForm = ({ formData, handleChange, handleAddressChange, form
             onChange={(e) => handleAddressChange('region', e.target.value)}
             className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Status:</label>
-          <select
-            value={formData.status || 'Pending'}
-            onChange={(e) => handleChange('status', e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="Pending">Pending</option>
-            <option value="Active">Active</option>
-            <option value="Rejected">Rejected</option>
-          </select>
         </div>
       </div>
     </div>

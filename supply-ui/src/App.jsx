@@ -15,7 +15,10 @@ import StepNavigator from './components/common/StepNavigator';
 
 const App = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [maxStepReached, setMaxStepReached] = useState(1);
   const [showApproverModal, setShowApproverModal] = useState(false);
+
+
 
   // ✅ Fully initialize formData to avoid undefined nested objects
   const [formData, setFormData] = useState({
@@ -50,8 +53,113 @@ const App = () => {
   const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
 
+
+
+  const FIELDS_PER_STEP = {
+    1: [
+      { name: 'supplierName', required: true },
+      { name: 'businessPartnerId', required: false },
+      { name: 'street', required: false },
+      { name: 'line2', required: false },
+      { name: 'line3', required: false },
+      { name: 'city', required: false },
+      { name: 'postalCode', required: false },
+      { name: 'country', required: true },
+      { name: 'region', required: false }
+    ],
+    2: [
+      { name: 'firstName', required: true },
+      { name: 'lastName', required: true },
+      { name: 'email', required: true },
+      { name: 'phone', required: false }
+    ],
+    3: [
+      { name: 'category', required: true },
+      { name: 'region', required: false },
+      { name: 'details', required: false } // from additionalInfo.details
+    ],
+    4: [
+      { name: 'attachments', required: true }
+    ],
+    5: [] // Review step
+  };
+  const isFieldFilled = (step, fieldConfig) => {
+    const { name } = fieldConfig;
+
+    switch (step) {
+      case 1:
+        if (name === 'supplierName') return !!formData.supplierName?.trim();
+        if (name === 'businessPartnerId') return !!formData.businessPartnerId?.trim();
+        if (['street', 'line2', 'line3', 'city', 'postalCode', 'country', 'region'].includes(name)) {
+          return !!formData.mainAddress[name]?.trim();
+        }
+        return false;
+
+      case 2:
+        if (['firstName', 'lastName', 'email', 'phone'].includes(name)) {
+          return !!formData.primaryContact[name]?.trim();
+        }
+        return false;
+
+      case 3:
+        if (name === 'category' || name === 'region') {
+          return !!formData.categoryAndRegion[name]?.trim();
+        }
+        if (name === 'details') {
+          return !!formData.additionalInfo.details?.trim();
+        }
+        return false;
+
+      case 4:
+        if (name === 'attachments') {
+          return Array.isArray(formData.attachments) && formData.attachments.length > 0;
+        }
+        return false;
+
+      default:
+        return false;
+    }
+  };
+  const totalProgressPercent = React.useMemo(() => {
+    const totalSteps = 4; // 5 steps → 4 intervals (0% to 100%)
+    if (totalSteps === 0) return 0;
+
+    // Progress from fully completed previous steps
+    const completedStepsProgress = (currentStep - 1) / totalSteps;
+
+    // Get current step fields
+    const currentStepFields = FIELDS_PER_STEP[currentStep] || [];
+    if (currentStepFields.length === 0) {
+      return Math.min(100, completedStepsProgress * 100);
+    }
+
+    // Calculate weighted progress in current step
+    let filledWeight = 0;
+    let maxWeight = 0;
+
+    currentStepFields.forEach(field => {
+      const weight = field.required ? 2 : 1;
+      maxWeight += weight;
+      if (isFieldFilled(currentStep, field)) {
+        filledWeight += weight;
+      }
+    });
+
+    const currentStepProgress = maxWeight > 0 ? filledWeight / maxWeight : 0;
+    const totalProgress = completedStepsProgress + (currentStepProgress / totalSteps);
+
+    return Math.min(100, Math.round(totalProgress * 100));
+  }, [formData, currentStep]);
   const goToStep = (step) => {
-    if (step >= 1 && step <= currentStep) {
+    if (step >= 1 && step <= maxStepReached) {
+      // ✅ Check all steps before target
+      for (let i = 1; i < step; i++) {
+        if (validateStep(i)) {
+          // If any previous step invalid, stop jumping
+          setCurrentStep(i);
+          return;
+        }
+      }
       setCurrentStep(step);
       setFormErrors({});
     }
@@ -60,7 +168,12 @@ const App = () => {
   const handleNextStep = () => {
     const hasErrors = validateStep(currentStep);
     if (hasErrors) return;
-    setCurrentStep(prevStep => (prevStep < 5 ? prevStep + 1 : prevStep));
+    //  setCurrentStep(prevStep => (prevStep < 5 ? prevStep + 1 : prevStep));
+    setCurrentStep((prevStep) => {
+      const nextStep = prevStep < 5 ? prevStep + 1 : prevStep;
+      setMaxStepReached((max) => Math.max(max, nextStep)); // ✅ update max step
+      return nextStep;
+    });
   };
 
   const handleBackStep = () => {
@@ -185,12 +298,12 @@ const App = () => {
         const formDataUpload = new FormData();
         formDataUpload.append('file', fileObj.rawFile);
         formDataUpload.append('supplierName', formData.supplierName);
-        
+
         const uploadResponse = await fetch(`http://localhost:8080/api/suppliers/${supplierId}/upload`, {
           method: 'POST',
           body: formDataUpload
         });
-        
+
         if (!uploadResponse.ok) {
           throw new Error(`Failed to upload ${fileObj.fileName}`);
         }
@@ -199,7 +312,7 @@ const App = () => {
 
       await Promise.all(uploadPromises);
       alert('Form submitted successfully!');
-      
+
       // Reset form
       setFormData({
         supplierName: '',
@@ -231,7 +344,7 @@ const App = () => {
       });
       setCurrentStep(1);
       setFormErrors({});
-      
+
     } catch (error) {
       console.error('Submission error:', error);
       alert('Error: ' + error.message);
@@ -317,7 +430,12 @@ const App = () => {
               />
               <div className="p-4 md:p-8 lg:p-12">
                 <div className="bg-white rounded-lg shadow-lg p-6">
-                  <TopStepProgress currentStep={currentStep} goToStep={goToStep} />
+                  <TopStepProgress
+                    currentStep={currentStep}
+                    maxStepReached={maxStepReached}   // ✅ pass it down
+                    goToStep={goToStep}
+                    progressPercent={totalProgressPercent}
+                  />
                   {renderFormContent()}
                   <StepNavigator
                     currentStep={currentStep}

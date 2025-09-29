@@ -22,8 +22,6 @@ const ReviewAndSubmitForm = ({ formData, onBack, onSubmit, goToStep }) => {
           </h3>
           <div className="mt-2 text-gray-700 grid grid-cols-2 gap-x-6 gap-y-1">
             <div className="flex"><span className="font-medium w-40">Supplier Name:</span><span>{formData.supplierName}</span></div>
-            <div className="flex"><span className="font-medium w-40">Business Partner ID:</span><span>{formData.businessPartnerId || '—'}</span></div>
-            <div className="flex"><span className="font-medium w-40">Status:</span><span>{formData.status}</span></div>
             <div className="flex"><span className="font-medium w-40">Street:</span><span>{formData.mainAddress.street}</span></div>
             <div className="flex"><span className="font-medium w-40">Line2:</span><span>{formData.mainAddress.line2}</span></div>
             <div className="flex"><span className="font-medium w-40">Line3:</span><span>{formData.mainAddress.line3}</span></div>
