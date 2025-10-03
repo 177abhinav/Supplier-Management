@@ -1,133 +1,119 @@
 // src/components/formSteps/ReviewAndSubmitForm.jsx
 import React from 'react';
-import StepNavigator from '../common/StepNavigator';
+import { Card, CardHeader, CardContent } from "../ui/card";
 
-const ReviewAndSubmitForm = ({ formData, onBack, onSubmit, goToStep }) => {
+const ReviewAndSubmitForm = ({ formData }) => {
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-700 mb-2">5. Review & Submit</h2>
-      <div className="space-y-2">
-        
-        {/* Supplier Details */}
-        <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">
-          <h3 className="flex items-center text-lg font-semibold text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Supplier Details
-          </h3>
-          <div className="mt-2 text-gray-700 grid grid-cols-2 gap-x-6 gap-y-1">
-            <div className="flex"><span className="font-medium w-40">Supplier Name:</span><span>{formData.supplierName}</span></div>
-            <div className="flex"><span className="font-medium w-40">Street:</span><span>{formData.mainAddress.street}</span></div>
-            <div className="flex"><span className="font-medium w-40">Line2:</span><span>{formData.mainAddress.line2}</span></div>
-            <div className="flex"><span className="font-medium w-40">Line3:</span><span>{formData.mainAddress.line3}</span></div>
-            <div className="flex"><span className="font-medium w-40">City:</span><span>{formData.mainAddress.city}</span></div>
-            <div className="flex"><span className="font-medium w-40">Postal Code:</span><span>{formData.mainAddress.postalCode}</span></div>
-            <div className="flex"><span className="font-medium w-40">Country:</span><span>{formData.mainAddress.country}</span></div>
-            <div className="flex"><span className="font-medium w-40">Region:</span><span>{formData.mainAddress.region}</span></div>
-          </div>
-        </div>
+    <Card className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200">
+      <CardHeader>
+        <h2 className="text-2xl font-bold text-[#1a365d] tracking-tight">
+          5. Review & Submit
+        </h2>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* LEFT COLUMN */}
+          <div className="space-y-4">
+            {/* Supplier Details */}
+            <Card className="border border-gray-200 shadow-sm rounded-lg">
+              <CardHeader className="p-3 pb-0">
+                <h3 className="text-lg font-semibold text-[#1a365d]">Supplier Details</h3>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <dl className="grid grid-cols-1 gap-y-2 text-sm text-gray-700">
+                  <div className="flex"><dt className="font-medium w-36">Supplier Name:</dt><dd>{formData.supplierName || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Street:</dt><dd>{formData.mainAddress.street || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Line 2:</dt><dd>{formData.mainAddress.line2 || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Line 3:</dt><dd>{formData.mainAddress.line3 || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">City:</dt><dd>{formData.mainAddress.city || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Postal Code:</dt><dd>{formData.mainAddress.postalCode || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Country:</dt><dd>{formData.mainAddress.country || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Region:</dt><dd>{formData.mainAddress.region || '—'}</dd></div>
+                </dl>
+              </CardContent>
+            </Card>
 
-        {/* Contact Details */}
-        <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">
-          <h3 className="flex items-center text-lg font-semibold text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Contact Details
-          </h3>
-          <div className="mt-2 text-gray-700 grid grid-cols-2 gap-x-6 gap-y-1">
-            <div className="flex"><span className="font-medium w-40">First Name:</span><span>{formData.primaryContact.firstName}</span></div>
-            <div className="flex"><span className="font-medium w-40">Last Name:</span><span>{formData.primaryContact.lastName}</span></div>
-            <div className="flex"><span className="font-medium w-40">Email:</span><span>{formData.primaryContact.email}</span></div>
-            <div className="flex"><span className="font-medium w-40">Phone:</span><span>{formData.primaryContact.phone}</span></div>
+            {/* Category & Region */}
+            <Card className="border border-gray-200 shadow-sm rounded-lg">
+              <CardHeader className="p-3 pb-0">
+                <h3 className="text-lg font-semibold text-[#1a365d]">Category & Region</h3>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <dl className="grid grid-cols-1 gap-y-2 text-sm text-gray-700">
+                  <div className="flex"><dt className="font-medium w-36">Category:</dt><dd>{formData.categoryAndRegion.category || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Region:</dt><dd>{formData.categoryAndRegion.region || '—'}</dd></div>
+                </dl>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        {/* Category & Region */}
-        <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">
-          <h3 className="flex items-center text-lg font-semibold text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Category & Region
-          </h3>
-          <div className="mt-2 text-gray-700 grid grid-cols-2 gap-x-6 gap-y-1">
-            <div className="flex"><span className="font-medium w-40">Category:</span><span>{formData.categoryAndRegion.category}</span></div>
-            <div className="flex"><span className="font-medium w-40">Region:</span><span>{formData.categoryAndRegion.region}</span></div>
-          </div>
-        </div>
+          {/* RIGHT COLUMN */}
+          <div className="space-y-4">
+            {/* Contact Details */}
+            <Card className="border border-gray-200 shadow-sm rounded-lg">
+              <CardHeader className="p-3 pb-0">
+                <h3 className="text-lg font-semibold text-[#1a365d]">Contact Details</h3>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <dl className="grid grid-cols-1 gap-y-2 text-sm text-gray-700">
+                  <div className="flex"><dt className="font-medium w-36">First Name:</dt><dd>{formData.primaryContact.firstName || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Last Name:</dt><dd>{formData.primaryContact.lastName || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Email:</dt><dd>{formData.primaryContact.email || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-36">Phone:</dt><dd>{formData.primaryContact.phone || '—'}</dd></div>
+                </dl>
+              </CardContent>
+            </Card>
 
-        {/* Additional Info */}
-        {formData.additionalInfo.details && (
-          <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">
-            <h3 className="flex items-center text-lg font-semibold text-gray-800">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Additional Information
-            </h3>
-            <div className="mt-2 text-gray-700">
-              <p>{formData.additionalInfo.details}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Uploaded Attachments */}
-        <div className="bg-gray-50 rounded-lg shadow-md p-4 border border-gray-200">
-          <h3 className="flex items-center text-lg font-semibold text-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Uploaded Attachments
-          </h3>
-          <div className="mt-2 text-gray-700">
-            {formData.attachments && formData.attachments.length > 0 ? (
-              <table className="min-w-full divide-y divide-blue-200">
-                <thead className="bg-blue-100">
-                  <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Name</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size (KB)</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {formData.attachments.map((file, idx) => (
-                    <tr key={idx} className="hover:bg-blue-100">
-                      <td className="px-4 py-2 whitespace-nowrap text-sm text-blue-900 font-medium">{file.fileName}</td>
-                      <td className="px-4 py-2 whitespace-nowrap text-sm text-blue-700">{file.fileType}</td>
-                      <td className="px-4 py-2 whitespace-nowrap text-sm text-blue-700">{(file.fileSize / 1024).toFixed(2)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <span className="text-gray-500">No files uploaded.</span>
+            {/* Additional Info */}
+            {formData.additionalInfo.details && (
+              <Card className="border border-gray-200 shadow-sm rounded-lg">
+                <CardHeader className="p-3 pb-0">
+                  <h3 className="text-lg font-semibold text-[#1a365d]">Additional Info</h3>
+                </CardHeader>
+                <CardContent className="p-4 pt-2">
+                  <p className="text-sm text-gray-700">{formData.additionalInfo.details}</p>
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
-      </div>
-    </div>
+
+        {/* Attachments (full width) */}
+        <div className="mt-6">
+          <Card className="border border-gray-200 shadow-sm rounded-lg">
+            <CardHeader className="p-3 pb-0">
+              <h3 className="text-lg font-semibold text-[#1a365d]">Uploaded Attachments</h3>
+            </CardHeader>
+            <CardContent className="p-4 pt-2">
+              {formData.attachments && formData.attachments.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-sm border border-gray-200 rounded-lg">
+                    <thead>
+                      <tr className="text-left text-xs text-gray-500 uppercase bg-gray-50">
+                        <th className="px-3 py-2">File Name</th>
+                        <th className="px-3 py-2">Type</th>
+                        <th className="px-3 py-2">Size (KB)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {formData.attachments.map((file, idx) => (
+                        <tr key={idx} className="hover:bg-gray-50">
+                          <td className="px-3 py-2 font-medium text-gray-900">{file.fileName}</td>
+                          <td className="px-3 py-2 text-gray-700">{file.fileType || 'Unknown'}</td>
+                          <td className="px-3 py-2 text-gray-700">{(file.fileSize / 1024).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">No files uploaded.</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

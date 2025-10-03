@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './components/common/Header';
 import SuppliersPage from './components/SuppliersListPage';
@@ -17,8 +17,7 @@ const App = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
   const [showApproverModal, setShowApproverModal] = useState(false);
-
-
+  const [touched, setTouched] = useState({});
 
   // ✅ Fully initialize formData to avoid undefined nested objects
   const [formData, setFormData] = useState({
@@ -53,8 +52,6 @@ const App = () => {
   const [formErrors, setFormErrors] = useState({});
   const navigate = useNavigate();
 
-
-
   const FIELDS_PER_STEP = {
     1: [
       { name: 'supplierName', required: true },
@@ -83,6 +80,7 @@ const App = () => {
     ],
     5: [] // Review step
   };
+
   const isFieldFilled = (step, fieldConfig) => {
     const { name } = fieldConfig;
 
@@ -120,20 +118,18 @@ const App = () => {
         return false;
     }
   };
-  const totalProgressPercent = React.useMemo(() => {
+
+  const totalProgressPercent = useMemo(() => {
     const totalSteps = 4; // 5 steps → 4 intervals (0% to 100%)
     if (totalSteps === 0) return 0;
 
-    // Progress from fully completed previous steps
     const completedStepsProgress = (currentStep - 1) / totalSteps;
-
-    // Get current step fields
     const currentStepFields = FIELDS_PER_STEP[currentStep] || [];
+
     if (currentStepFields.length === 0) {
       return Math.min(100, completedStepsProgress * 100);
     }
 
-    // Calculate weighted progress in current step
     let filledWeight = 0;
     let maxWeight = 0;
 
@@ -150,12 +146,11 @@ const App = () => {
 
     return Math.min(100, Math.round(totalProgress * 100));
   }, [formData, currentStep]);
+
   const goToStep = (step) => {
     if (step >= 1 && step <= maxStepReached) {
-      // ✅ Check all steps before target
       for (let i = 1; i < step; i++) {
         if (validateStep(i)) {
-          // If any previous step invalid, stop jumping
           setCurrentStep(i);
           return;
         }
@@ -168,10 +163,10 @@ const App = () => {
   const handleNextStep = () => {
     const hasErrors = validateStep(currentStep);
     if (hasErrors) return;
-    //  setCurrentStep(prevStep => (prevStep < 5 ? prevStep + 1 : prevStep));
+
     setCurrentStep((prevStep) => {
       const nextStep = prevStep < 5 ? prevStep + 1 : prevStep;
-      setMaxStepReached((max) => Math.max(max, nextStep)); // ✅ update max step
+      setMaxStepReached((max) => Math.max(max, nextStep));
       return nextStep;
     });
   };
@@ -234,17 +229,17 @@ const App = () => {
     return hasErrors;
   };
 
-  // Handle changes for top-level fields
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    setTouched(prev => ({ ...prev, [field]: true })); // ✅ mark as touched
   };
 
-  // Handle changes for nested objects
   const handleAddressChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       mainAddress: { ...prev.mainAddress, [field]: value }
     }));
+     setTouched(prev => ({ ...prev, [`mainAddress.${field}`]: true })); // ✅
   };
 
   const handleContactChange = (field, value) => {
@@ -252,6 +247,7 @@ const App = () => {
       ...prev,
       primaryContact: { ...prev.primaryContact, [field]: value }
     }));
+    setTouched(prev => ({ ...prev, [`primaryContact.${field}`]: true })); // ✅
   };
 
   const handleCategoryChange = (field, value) => {
@@ -259,6 +255,7 @@ const App = () => {
       ...prev,
       categoryAndRegion: { ...prev.categoryAndRegion, [field]: value }
     }));
+    setTouched(prev => ({ ...prev, [`categoryAndRegion.${field}`]: true }));
   };
 
   const handleAdditionalInfoChange = (value) => {
@@ -266,6 +263,7 @@ const App = () => {
       ...prev,
       additionalInfo: { details: value }
     }));
+    setTouched(prev => ({ ...prev, 'additionalInfo.details': true })); // ✅
   };
 
   const handleSubmit = async () => {
@@ -293,7 +291,6 @@ const App = () => {
       const supplierResult = await supplierResponse.json();
       const supplierId = supplierResult.id;
 
-      // Upload files
       const uploadPromises = formData.attachments.map(async (fileObj) => {
         const formDataUpload = new FormData();
         formDataUpload.append('file', fileObj.rawFile);
@@ -313,7 +310,6 @@ const App = () => {
       await Promise.all(uploadPromises);
       alert('Form submitted successfully!');
 
-      // Reset form
       setFormData({
         supplierName: '',
         status: 'Pending',
@@ -344,7 +340,6 @@ const App = () => {
       });
       setCurrentStep(1);
       setFormErrors({});
-
     } catch (error) {
       console.error('Submission error:', error);
       alert('Error: ' + error.message);
@@ -360,6 +355,7 @@ const App = () => {
             handleChange={handleChange}
             handleAddressChange={handleAddressChange}
             formErrors={formErrors}
+              touched={touched}
             onNext={handleNextStep}
             goToStep={goToStep}
           />
@@ -371,6 +367,7 @@ const App = () => {
             handleChange={handleChange}
             handleContactChange={handleContactChange}
             formErrors={formErrors}
+            touched={touched}
             onNext={handleNextStep}
             onBack={handleBackStep}
             goToStep={goToStep}
@@ -384,6 +381,7 @@ const App = () => {
             handleCategoryChange={handleCategoryChange}
             handleAdditionalInfoChange={handleAdditionalInfoChange}
             formErrors={formErrors}
+            touched={touched}
             onNext={handleNextStep}
             onBack={handleBackStep}
             goToStep={goToStep}
@@ -429,14 +427,19 @@ const App = () => {
                 }}
               />
               <div className="p-4 md:p-8 lg:p-12">
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                {/* 👇 Top Progress Bar - Separate from form */}
+                <div className="mb-6 bg-white rounded-lg shadow-sm py-4 px-4">
                   <TopStepProgress
                     currentStep={currentStep}
-                    maxStepReached={maxStepReached}   // ✅ pass it down
+                    maxStepReached={maxStepReached}
                     goToStep={goToStep}
                     progressPercent={totalProgressPercent}
                   />
-                  {renderFormContent()}
+                </div>
+
+                {/* 👇 Form Content - Inside white card */}
+                {renderFormContent()}
+                <div className="mt-6">
                   <StepNavigator
                     currentStep={currentStep}
                     totalSteps={5}
