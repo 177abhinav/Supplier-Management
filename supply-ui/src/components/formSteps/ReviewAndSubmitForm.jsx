@@ -3,8 +3,10 @@ import React from 'react';
 import { Card, CardHeader, CardContent } from "../ui/card";
 
 const ReviewAndSubmitForm = ({ formData }) => {
+  const cardStyle = "w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200";
+
   return (
-    <Card className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200">
+    <Card className={cardStyle}>
       <CardHeader>
         <h2 className="text-2xl font-bold text-[#1a365d] tracking-tight">
           5. Review & Submit
@@ -12,75 +14,62 @@ const ReviewAndSubmitForm = ({ formData }) => {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
           {/* LEFT COLUMN */}
           <div className="space-y-4">
             {/* Supplier Details */}
-            <Card className="border border-gray-200 shadow-sm rounded-lg">
+            <Card className={cardStyle}>
               <CardHeader className="p-3 pb-0">
                 <h3 className="text-lg font-semibold text-[#1a365d]">Supplier Details</h3>
               </CardHeader>
               <CardContent className="p-4 pt-2">
-                <dl className="grid grid-cols-1 gap-y-2 text-sm text-gray-700">
-                  <div className="flex"><dt className="font-medium w-36">Supplier Name:</dt><dd>{formData.supplierName || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Street:</dt><dd>{formData.mainAddress.street || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Line 2:</dt><dd>{formData.mainAddress.line2 || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Line 3:</dt><dd>{formData.mainAddress.line3 || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">City:</dt><dd>{formData.mainAddress.city || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Postal Code:</dt><dd>{formData.mainAddress.postalCode || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Country:</dt><dd>{formData.mainAddress.country || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Region:</dt><dd>{formData.mainAddress.region || '—'}</dd></div>
-                </dl>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-700">
+                  <div className="flex"><dt className="font-medium w-28">Supplier Name:</dt><dd>{formData.supplierName || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Street:</dt><dd>{formData.mainAddress.street || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Line 2:</dt><dd>{formData.mainAddress.line2 || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Line 3:</dt><dd>{formData.mainAddress.line3 || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">City:</dt><dd>{formData.mainAddress.city || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Postal Code:</dt><dd>{formData.mainAddress.postalCode || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Country:</dt><dd>{formData.mainAddress.country || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Region:</dt><dd>{formData.mainAddress.region || '—'}</dd></div>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Category & Region */}
-            <Card className="border border-gray-200 shadow-sm rounded-lg">
-              <CardHeader className="p-3 pb-0">
-                <h3 className="text-lg font-semibold text-[#1a365d]">Category & Region</h3>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <dl className="grid grid-cols-1 gap-y-2 text-sm text-gray-700">
-                  <div className="flex"><dt className="font-medium w-36">Category:</dt><dd>{formData.categoryAndRegion.category || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Region:</dt><dd>{formData.categoryAndRegion.region || '—'}</dd></div>
-                </dl>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* RIGHT COLUMN */}
-          <div className="space-y-4">
             {/* Contact Details */}
-            <Card className="border border-gray-200 shadow-sm rounded-lg">
+            <Card className={cardStyle}>
               <CardHeader className="p-3 pb-0">
                 <h3 className="text-lg font-semibold text-[#1a365d]">Contact Details</h3>
               </CardHeader>
               <CardContent className="p-4 pt-2">
-                <dl className="grid grid-cols-1 gap-y-2 text-sm text-gray-700">
-                  <div className="flex"><dt className="font-medium w-36">First Name:</dt><dd>{formData.primaryContact.firstName || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Last Name:</dt><dd>{formData.primaryContact.lastName || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Email:</dt><dd>{formData.primaryContact.email || '—'}</dd></div>
-                  <div className="flex"><dt className="font-medium w-36">Phone:</dt><dd>{formData.primaryContact.phone || '—'}</dd></div>
-                </dl>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-700">
+                  <div className="flex"><dt className="font-medium w-28">First Name:</dt><dd>{formData.primaryContact.firstName || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Last Name:</dt><dd>{formData.primaryContact.lastName || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Email:</dt><dd>{formData.primaryContact.email || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Phone:</dt><dd>{formData.primaryContact.phone || '—'}</dd></div>
+                </div>
               </CardContent>
             </Card>
 
-            {/* Additional Info */}
-            {formData.additionalInfo.details && (
-              <Card className="border border-gray-200 shadow-sm rounded-lg">
-                <CardHeader className="p-3 pb-0">
-                  <h3 className="text-lg font-semibold text-[#1a365d]">Additional Info</h3>
-                </CardHeader>
-                <CardContent className="p-4 pt-2">
-                  <p className="text-sm text-gray-700">{formData.additionalInfo.details}</p>
-                </CardContent>
-              </Card>
-            )}
+            {/* Category & Region */}
+            <Card className={cardStyle}>
+              <CardHeader className="p-3 pb-0">
+                <h3 className="text-lg font-semibold text-[#1a365d]">Category & Region</h3>
+              </CardHeader>
+              <CardContent className="p-4 pt-2">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm text-gray-700">
+                  <div className="flex"><dt className="font-medium w-28">Category:</dt><dd>{formData.categoryAndRegion.category || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Region:</dt><dd>{formData.categoryAndRegion.region || '—'}</dd></div>
+                  <div className="flex"><dt className="font-medium w-28">Additional Info:</dt><dd>{formData.additionalInfo.details || '—'}</dd></div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
         {/* Attachments (full width) */}
-        <div className="mt-6">
-          <Card className="border border-gray-200 shadow-sm rounded-lg">
+        <div className="mt-5">
+          <Card className={cardStyle}>
             <CardHeader className="p-3 pb-0">
               <h3 className="text-lg font-semibold text-[#1a365d]">Uploaded Attachments</h3>
             </CardHeader>

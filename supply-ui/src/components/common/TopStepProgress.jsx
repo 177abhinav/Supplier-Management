@@ -38,7 +38,7 @@ const TopStepProgress = ({
           <div className="flex justify-between w-full relative z-10">
             {steps.map((step) => {
               const isActive = currentStep === step.id;
-              const isCompleted = currentStep > step.id;
+              const isCompleted = step.id < currentStep; // Only steps before current are "completed"
 
               return (
                 <div
@@ -51,13 +51,16 @@ const TopStepProgress = ({
                     disabled={step.id > maxStepReached}
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 shadow-md border-2
                       ${
-                        isActive
-                          ? "bg-[#1a365d] text-white border-[#1a365d] scale-110 focus:ring-1 focus:ring-[#1a365d] focus:shadow-[0_0_0_3px_rgba(26,54,93,0.2)]"
+                        isCompleted || isActive
+                          ? "bg-[#1a365d] text-white border-[#1a365d] " +
+                            (isActive
+                              ? "scale-110 focus:ring-1 focus:ring-[#1a365d] focus:shadow-[0_0_0_3px_rgba(26,54,93,0.2)]"
+                              : "")
                           : step.id <= maxStepReached
                           ? "bg-white text-[#1a365d] border-gray-200 hover:bg-gray-50 hover:text-[#1a365d] focus:ring-1 focus:ring-[#1a365d] focus:shadow-[0_0_0_3px_rgba(26,54,93,0.2)]"
-                          : "bg-gray-50 text-gray-400 border-2 border-gray-300 cursor-not-allowed"
+                          : "bg-gray-50 text-gray-400 border-gray-300 cursor-not-allowed"
                       }`}
-                    aria-label={`Step ${step.id}`}
+                    aria-label={`Step ${step.id}: ${step.title}`}
                   >
                     {step.id}
                   </button>
@@ -66,7 +69,7 @@ const TopStepProgress = ({
                   <span
                     className={`mt-3 text-xs md:text-sm font-medium text-center whitespace-nowrap transition-colors duration-300
                       ${
-                        isActive
+                        isCompleted || isActive
                           ? "text-[#1a365d] font-semibold"
                           : step.id <= maxStepReached
                           ? "text-gray-700"

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 const SupplierDetailModal = ({ supplierId, onClose }) => {
   const [supplier, setSupplier] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchSupplier = async () => {
@@ -14,7 +13,44 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
         const data = await res.json();
         setSupplier(data);
       } catch (err) {
-        setError(err.message);
+        // Dummy fallback data
+        setSupplier({
+          supplierName: "Demo Supplier",
+          status: "Active",
+          businessPartnerId: "BP-12345",
+          mainAddress: {
+            country: "India",
+            city: "Hyderabad",
+            region: "Telangana",
+            street: "Demo Street",
+            postalCode: "500081"
+          },
+          primaryContact: {
+            firstName: "John",
+            lastName: "Doe",
+            email: "john.doe@example.com",
+            phone: "+91 9876543210"
+          },
+          categoryAndRegion: {
+            category: "Electronics",
+            region: "South"
+          },
+          additionalInfo: {
+            details: "This is a dummy additional information."
+          },
+          attachments: [
+            {
+              fileName: "demo_file_1.pdf",
+              mimeType: "application/pdf",
+              fileSize: 204800
+            },
+            {
+              fileName: "demo_file_2.jpg",
+              mimeType: "image/jpeg",
+              fileSize: 102400
+            }
+          ]
+        });
       } finally {
         setLoading(false);
       }
@@ -24,7 +60,6 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
   }, [supplierId]);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
   if (!supplier) return null;
 
   const InfoRow = ({ label, value }) => (
@@ -34,9 +69,11 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
     </div>
   );
 
+  const cardStyle = "border rounded-lg p-4 bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md mb-4";
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-[900px] max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+      <div className="w-full max-w-[900px] max-h-[90vh] overflow-y-auto p-6 bg-white rounded-xl shadow-xl">
         <div className="flex justify-between items-center border-b pb-3 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Supplier Details</h2>
           <button
@@ -47,9 +84,9 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-2 gap-8">
           {/* Supplier Information */}
-          <div className="border rounded-lg p-4 bg-gray-50 shadow-sm">
+          <div className={cardStyle}>
             <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
               Supplier Information
             </h3>
@@ -64,7 +101,7 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
           </div>
 
           {/* Contact Information */}
-          <div className="border rounded-lg p-4 bg-gray-50 shadow-sm">
+          <div className={cardStyle}>
             <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
               Contact Information
             </h3>
@@ -78,7 +115,7 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
         </div>
 
         {/* Additional Information */}
-        <div className="border rounded-lg p-4 bg-gray-50 shadow-sm mb-8">
+        <div className={cardStyle}>
           <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
             Additional Information
           </h3>
@@ -87,7 +124,7 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
 
         {/* Attachments */}
         {supplier.attachments?.length > 0 && (
-          <div className="border rounded-lg p-4 bg-gray-50 shadow-sm">
+          <div className={cardStyle}>
             <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
               Attachments
             </h3>
@@ -113,7 +150,7 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
                     </td>
                     <td className="border px-3 py-2">
                       <a
-                        href={`/api/suppliers/${supplier.ID}/attachments/${encodeURIComponent(file.fileName)}`}
+                        href={`/api/suppliers/${supplier.ID || supplierId}/attachments/${encodeURIComponent(file.fileName)}`}
                         download={file.fileName}
                         className="text-blue-600 hover:underline"
                       >

@@ -9,7 +9,8 @@ const StepNavigator = ({
   onSubmit,
   goToStep,
   isFirstStep,
-  isLastStep
+  isLastStep,
+  maxStepReached
 }) => {
   return (
     <div className="mt-6">
@@ -31,20 +32,21 @@ const StepNavigator = ({
         {[...Array(totalSteps)].map((_, index) => {
           const step = index + 1;
           const isActive = step === currentStep;
-          const isFuture = step > currentStep;
+          const isCompleted = step < currentStep;
+          const isClickable = step <= maxStepReached;
 
           return (
             <button
               key={step}
-              onClick={() => !isFuture && goToStep && goToStep(step)}
-              disabled={isFuture}
+              onClick={() => isClickable && goToStep && goToStep(step)}
+              disabled={!isClickable}
               className={`w-10 h-10 rounded-full font-bold transition-all duration-200 flex items-center justify-center text-sm
                 ${
                   isActive
                     ? 'bg-[#1a365d] text-white scale-110 border-2 border-[#1a365d] shadow-md focus:outline-none focus:ring-1 focus:ring-[#1a365d] focus:shadow-[0_0_0_3px_rgba(26,54,93,0.2)]'
-                    : isFuture
-                      ? 'bg-gray-50 text-gray-400 border-2 border-gray-300 cursor-not-allowed'
-                      : 'bg-white text-[#1a365d] border-2 border-gray-200 hover:bg-gray-50 hover:text-[#1a365d] focus:outline-none focus:ring-1 focus:ring-[#1a365d] focus:shadow-[0_0_0_3px_rgba(26,54,93,0.2)]'
+                    : isClickable
+                      ? 'bg-white text-[#1a365d] border-2 border-gray-200 hover:bg-gray-50 hover:text-[#1a365d] focus:outline-none focus:ring-1 focus:ring-[#1a365d] focus:shadow-[0_0_0_3px_rgba(26,54,93,0.2)]'
+                      : 'bg-gray-50 text-gray-400 border-2 border-gray-300 cursor-not-allowed'
                 }`}
               aria-label={`Step ${step}`}
             >

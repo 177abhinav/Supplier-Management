@@ -428,11 +428,11 @@ const App = () => {
               />
               <div className="p-4 md:p-8 lg:p-12">
                 {/* 👇 Top Progress Bar - Separate from form */}
-                <div className="mb-6 bg-white rounded-lg shadow-sm py-4 px-4">
+                <div>
                   <TopStepProgress
                     currentStep={currentStep}
-                    maxStepReached={maxStepReached}
-                    goToStep={goToStep}
+                  //  maxStepReached={maxStepReached}
+                 //   goToStep={goToStep}
                     progressPercent={totalProgressPercent}
                   />
                 </div>
@@ -442,6 +442,7 @@ const App = () => {
                 <div className="mt-6">
                   <StepNavigator
                     currentStep={currentStep}
+                    maxStepReached={maxStepReached}
                     totalSteps={5}
                     onBack={handleBackStep}
                     onNext={handleNextStep}
