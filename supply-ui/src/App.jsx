@@ -13,6 +13,7 @@ import SupplierDetailPage from './components/SupplierDetailPage';
 import TopStepProgress from './components/common/TopStepProgress';
 import StepNavigator from './components/common/StepNavigator';
 
+
 const App = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [maxStepReached, setMaxStepReached] = useState(1);
@@ -413,7 +414,9 @@ const App = () => {
   };
 
   return (
+    //for white bg= bg-white
     <div className="min-h-screen bg-gray-100 font-sans text-gray-800">
+   
       <Routes>
         <Route
           path="/"

@@ -13,7 +13,6 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
         const data = await res.json();
         setSupplier(data);
       } catch (err) {
-        // Dummy fallback data
         setSupplier({
           supplierName: "Demo Supplier",
           status: "Active",
@@ -59,110 +58,134 @@ const SupplierDetailModal = ({ supplierId, onClose }) => {
     fetchSupplier();
   }, [supplierId]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+        <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md text-center border border-gray-200">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-700 font-medium">Loading supplier details...</p>
+        </div>
+      </div>
+    );
+
   if (!supplier) return null;
 
   const InfoRow = ({ label, value }) => (
     <div className="flex justify-between py-1">
-      <span className="font-medium text-gray-600 w-40">{label}</span>
-      <span className="text-gray-900 flex-1">{value || "—"}</span>
+      <span className="font-medium text-gray-600 w-48">{label}</span>
+      <span className="text-gray-900 flex-1 break-words">{value || "—"}</span>
     </div>
   );
 
-  const cardStyle = "border rounded-lg p-4 bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md mb-4";
+  const cardStyle = "w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200 p-4 mb-4";
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-      <div className="w-full max-w-[900px] max-h-[90vh] overflow-y-auto p-6 bg-white rounded-xl shadow-xl">
-        <div className="flex justify-between items-center border-b pb-3 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Supplier Details</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-black text-xl"
-          >
-            ✖
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8">
-          {/* Supplier Information */}
-          <div className={cardStyle}>
-            <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
-              Supplier Information
-            </h3>
-            <InfoRow label="Supplier Name:" value={supplier.supplierName} />
-            <InfoRow label="Status:" value={supplier.status} />
-            <InfoRow label="Business Partner ID:" value={supplier.businessPartnerId} />
-            <InfoRow label="Country:" value={supplier.mainAddress?.country} />
-            <InfoRow label="City:" value={supplier.mainAddress?.city} />
-            <InfoRow label="Region:" value={supplier.mainAddress?.region} />
-            <InfoRow label="Street:" value={supplier.mainAddress?.street} />
-            <InfoRow label="Postal Code:" value={supplier.mainAddress?.postalCode} />
-          </div>
-
-          {/* Contact Information */}
-          <div className={cardStyle}>
-            <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
-              Contact Information
-            </h3>
-            <InfoRow label="First Name:" value={supplier.primaryContact?.firstName} />
-            <InfoRow label="Last Name:" value={supplier.primaryContact?.lastName} />
-            <InfoRow label="Email:" value={supplier.primaryContact?.email} />
-            <InfoRow label="Phone:" value={supplier.primaryContact?.phone} />
-            <InfoRow label="Category:" value={supplier.categoryAndRegion?.category} />
-            <InfoRow label="Region:" value={supplier.categoryAndRegion?.region} />
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4">
+      <div className="w-full max-w-[900px] max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-gray-200">
+        
+        {/* ✨ Gradient Header (Matching Form Steps) ✨ */}
+        <div className="
+          !bg-gradient-to-r from-[#1e293b] via-[#334155] to-[#1e293b]
+          px-6 py-5
+          border-b-4 border-blue-500
+          rounded-t-2xl
+        ">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                Supplier Details
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-white hover:text-blue-200 text-2xl font-bold transition-colors"
+              aria-label="Close"
+            >
+              &times;
+            </button>
           </div>
         </div>
 
-        {/* Additional Information */}
-        <div className={cardStyle}>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
-            Additional Information
-          </h3>
-          <p className="text-gray-900">{supplier.additionalInfo?.details || "N/A"}</p>
-        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Supplier Information */}
+            <div className={cardStyle}>
+              <h3 className="text-lg font-semibold text-[#1a365d] mb-3 pb-2 border-b border-gray-200">
+                Supplier Information
+              </h3>
+              <InfoRow label="Supplier Name:" value={supplier.supplierName} />
+              <InfoRow label="Status:" value={supplier.status} />
+              <InfoRow label="Business Partner ID:" value={supplier.businessPartnerId} />
+              <InfoRow label="Country:" value={supplier.mainAddress?.country} />
+              <InfoRow label="City:" value={supplier.mainAddress?.city} />
+              <InfoRow label="Region:" value={supplier.mainAddress?.region} />
+              <InfoRow label="Street:" value={supplier.mainAddress?.street} />
+              <InfoRow label="Postal Code:" value={supplier.mainAddress?.postalCode} />
+            </div>
 
-        {/* Attachments */}
-        {supplier.attachments?.length > 0 && (
-          <div className={cardStyle}>
-            <h3 className="text-lg font-semibold text-gray-700 mb-3 border-b pb-2">
-              Attachments
-            </h3>
-            <table className="w-full border border-gray-200 text-sm rounded-lg overflow-hidden">
-              <thead className="bg-gray-100 text-gray-700">
-                <tr>
-                  <th className="border px-3 py-2 text-left">File Name</th>
-                  <th className="border px-3 py-2 text-left">Type</th>
-                  <th className="border px-3 py-2 text-left">Size (KB)</th>
-                  <th className="border px-3 py-2 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {supplier.attachments.map((file, idx) => (
-                  <tr
-                    key={idx}
-                    className="hover:bg-gray-50 transition-colors duration-150"
-                  >
-                    <td className="border px-3 py-2">{file.fileName}</td>
-                    <td className="border px-3 py-2">{file.mimeType}</td>
-                    <td className="border px-3 py-2">
-                      {(file.fileSize / 1024).toFixed(1)}
-                    </td>
-                    <td className="border px-3 py-2">
-                      <a
-                        href={`/api/suppliers/${supplier.ID || supplierId}/attachments/${encodeURIComponent(file.fileName)}`}
-                        download={file.fileName}
-                        className="text-blue-600 hover:underline"
-                      >
-                        Download
-                      </a>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* Contact & Category Information */}
+            <div className={cardStyle}>
+              <h3 className="text-lg font-semibold text-[#1a365d] mb-3 pb-2 border-b border-gray-200">
+                Contact & Category
+              </h3>
+              <InfoRow label="First Name:" value={supplier.primaryContact?.firstName} />
+              <InfoRow label="Last Name:" value={supplier.primaryContact?.lastName} />
+              <InfoRow label="Email:" value={supplier.primaryContact?.email} />
+              <InfoRow label="Phone:" value={supplier.primaryContact?.phone} />
+              <InfoRow label="Category:" value={supplier.categoryAndRegion?.category} />
+              <InfoRow label="Region:" value={supplier.categoryAndRegion?.region} />
+            </div>
           </div>
-        )}
+
+          {/* Additional Information */}
+          <div className={cardStyle}>
+            <h3 className="text-lg font-semibold text-[#1a365d] mb-3 pb-2 border-b border-gray-200">
+              Additional Information
+            </h3>
+            <p className="text-gray-900 whitespace-pre-wrap">
+              {supplier.additionalInfo?.details || "N/A"}
+            </p>
+          </div>
+
+          {/* Attachments */}
+          {supplier.attachments?.length > 0 && (
+            <div className={cardStyle}>
+              <h3 className="text-lg font-semibold text-[#1a365d] mb-3 pb-2 border-b border-gray-200">
+                Attachments
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-100 text-gray-700 text-left">
+                      <th className="px-4 py-2 font-semibold">File Name</th>
+                      <th className="px-4 py-2 font-semibold">Type</th>
+                      <th className="px-4 py-2 font-semibold">Size (KB)</th>
+                      <th className="px-4 py-2 font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {supplier.attachments.map((file, idx) => (
+                      <tr key={idx} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 break-all">{file.fileName}</td>
+                        <td className="px-4 py-3">{file.mimeType}</td>
+                        <td className="px-4 py-3">{(file.fileSize / 1024).toFixed(1)}</td>
+                        <td className="px-4 py-3">
+                          <a
+                            href={`/api/suppliers/${supplier.ID || supplierId}/attachments/${encodeURIComponent(file.fileName)}`}
+                            download={file.fileName}
+                            className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
+                          >
+                            Download
+                          </a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

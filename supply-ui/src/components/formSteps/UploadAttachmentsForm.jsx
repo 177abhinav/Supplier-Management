@@ -4,17 +4,56 @@ import { Button } from "../ui/button";
 import { Card, CardHeader, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 
+// Helper: Format file size to human-readable (KB, MB, etc.)
+const formatFileSize = (bytes) => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+// Allowed MIME types and extensions
+const ALLOWED_TYPES = [
+  'application/pdf',
+  'application/msword', // .doc
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+  'application/vnd.ms-excel', // .xls
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // .xlsx
+];
+
+const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'xls', 'xlsx'];
+
 const UploadAttachmentsForm = ({ attachments, setAttachments, error }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const fileInputRef = useRef(null);
 
+  // Validate file type by MIME type or extension
+  const isValidFileType = (file) => {
+    const mimeTypeValid = ALLOWED_TYPES.includes(file.type);
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const extensionValid = ALLOWED_EXTENSIONS.includes(extension);
+    return mimeTypeValid || extensionValid;
+  };
+
   const handleAddFile = (e) => {
     const selectedFiles = Array.from(e.target.files);
+
+    // Check for invalid file types
+    const invalidFiles = selectedFiles.filter(file => !isValidFileType(file));
+    if (invalidFiles.length > 0) {
+      setErrorMsg('Only PDF, DOC, DOCX, XLS, and XLSX files are allowed.');
+      e.target.value = ''; // reset input
+      return;
+    }
+
+    // Check file count limit
     if (attachments.length + selectedFiles.length > 2) {
       setErrorMsg('You can only upload up to 2 files.');
       e.target.value = '';
       return;
     }
+
     setErrorMsg('');
     const newFiles = selectedFiles.map(file => ({
       fileName: file.name,
@@ -42,9 +81,18 @@ const UploadAttachmentsForm = ({ attachments, setAttachments, error }) => {
   return (
     <Card className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200">
       <CardHeader>
-        <h2 className="text-2xl font-bold text-[#1a365d] tracking-tight">
-          4. Upload Attachments
-        </h2>
+        <div className="!bg-gradient-to-r from-[#2b4d8a] via-[#3e6ab3] to-[#2b4d8a] px-4 py-1 border-b-4 border-blue-500 rounded-lg">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-xl bg-blue-500 flex items-center justify-center shadow">
+            <span className="text-white font-bold text-base">4</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white ">
+              Upload Attachments
+            </h2>
+          </div>
+        </div>
+      </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -57,6 +105,8 @@ const UploadAttachmentsForm = ({ attachments, setAttachments, error }) => {
               multiple
               className="hidden"
               disabled={attachments.length >= 2}
+              // Optional: hint to browser about allowed types
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
             />
             <Button
               type="button"
@@ -70,7 +120,7 @@ const UploadAttachmentsForm = ({ attachments, setAttachments, error }) => {
             </Button>
           </div>
 
-          {/* Max file error */}
+          {/* Max file or type error */}
           {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
 
           {/* Validation error */}
@@ -94,7 +144,7 @@ const UploadAttachmentsForm = ({ attachments, setAttachments, error }) => {
                   <tr className="text-left text-xs text-gray-500 uppercase">
                     <th className="pb-2">File Name</th>
                     <th className="pb-2">Type</th>
-                    <th className="pb-2">Size (KB)</th>
+                    <th className="pb-2">Size</th> {/* Removed "(KB)" */}
                     <th className="pb-2">Action</th>
                   </tr>
                 </thead>
@@ -103,7 +153,7 @@ const UploadAttachmentsForm = ({ attachments, setAttachments, error }) => {
                     <tr key={index} className="border-t border-gray-200">
                       <td className="py-2 font-medium text-gray-900">{file.fileName}</td>
                       <td className="py-2 text-gray-700">{file.fileType || 'Unknown'}</td>
-                      <td className="py-2 text-gray-700">{(file.fileSize / 1024).toFixed(2)}</td>
+                      <td className="py-2 text-gray-700">{formatFileSize(file.fileSize)}</td> {/* ✅ Human-readable */}
                       <td className="py-2">
                         <Button
                           variant="ghost"

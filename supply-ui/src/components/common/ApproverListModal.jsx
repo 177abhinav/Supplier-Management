@@ -26,18 +26,16 @@ const ApproverListModal = ({ onClose }) => {
         setApprovers(data);
       } catch (err) {
         console.warn("Fetch failed, using dummy data:", err.message);
-
-        const dummyApprovers = [
+        setApprovers([
           { id: 1, name: "Alice Johnson", email: "alice@company.com", level: "1", country: "USA" },
           { id: 2, name: "Bob Smith", email: "bob@company.com", level: "2", country: "UK" },
           { id: 3, name: "Charlie Lee", email: "charlie@company.com", level: "1", country: "Canada" },
-        ];
-        setApprovers(dummyApprovers);
-        setError(null);
+        ]);
       } finally {
         setLoading(false);
       }
     };
+
     fetchApprovers();
   }, []);
 
@@ -113,9 +111,9 @@ const ApproverListModal = ({ onClose }) => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 z-50">
-        <div className="bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-xl p-8 w-full max-w-xl text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600 border-b-4 mb-4 mx-auto"></div>
+      <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center p-4 z-50">
+        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-xl text-center border border-gray-200">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-600 mb-4 mx-auto"></div>
           <p className="text-gray-700 font-medium text-lg">Loading approvers...</p>
         </div>
       </div>
@@ -125,27 +123,56 @@ const ApproverListModal = ({ onClose }) => {
   return (
     <>
       {/* Main Approver List Modal */}
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 z-50 overflow-auto">
-        <div className="relative bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-2xl p-6 w-full max-w-6xl">
-          <h2 className="text-2xl font-bold text-[#1a365d] mb-6">
-            Approver List
-          </h2>
+      <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center p-4 z-50 overflow-auto">
+        <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-4xl border border-gray-200">
 
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-700">Approvers</h3>
+          {/* ✨ EXACT SAME HEADER STYLE AS FORM & SUPPLIERS PAGE ✨ */}
+          <div
+            className="
+    flex items-center justify-between
+    !bg-gradient-to-r from-[#2b4d8a] via-[#3e6ab3] to-[#2b4d8a]
+    px-4 py-2
+    border-b-4 border-blue-500
+    rounded-lg
+    mb-6
+    shadow-md
+  "
+          >
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-white tracking-tight">
+              Approver List
+            </h2>
+
+            {/* Add Approver Button (right aligned) */}
             <button
               onClick={openCreateModal}
-              className="bg-[#1a365d] hover:bg-[#153052] text-white px-4 py-2 rounded-xl font-semibold transition-shadow duration-200 shadow-md hover:shadow-lg"
+              className="bg-[#1a365d] hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-semibold transition-shadow duration-200 shadow-md hover:shadow-lg flex items-center gap-1.5"
             >
-              + Add Approver
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
+              </svg>
+              Add Approver
             </button>
           </div>
 
+
+          {/* Approvers Table */}
           <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-[#e0e7ff]">
                 <tr>
-                  {["Name", "Email", "Level", "Country", "Actions"].map((col) => (
+                  {["Name", "Email", "Level", "Country"].map((col) => (
                     <th
                       key={col}
                       className="px-6 py-3 text-left text-xs font-bold text-[#1a365d] uppercase tracking-wider"
@@ -159,7 +186,7 @@ const ApproverListModal = ({ onClose }) => {
                 {approvers.map((approver) => (
                   <tr
                     key={approver.id}
-                    className="hover:bg-blue-50 transition-all duration-200 cursor-pointer"
+                    className="hover:bg-blue-50 transition-all duration-200"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-gray-900">
                       {approver.name}
@@ -173,14 +200,7 @@ const ApproverListModal = ({ onClose }) => {
                     <td className="px-6 py-4 text-sm text-gray-900">
                       {approver.country}
                     </td>
-                    <td className="px-6 py-4 text-sm">
-                      <button
-                        onClick={() => openEditModal(approver)}
-                        className="text-[#1a365d] hover:text-[#153052] font-semibold transition-colors duration-200"
-                      >
-                        Edit
-                      </button>
-                    </td>
+    
                   </tr>
                 ))}
               </tbody>
@@ -201,7 +221,8 @@ const ApproverListModal = ({ onClose }) => {
       {/* Create/Edit Modal */}
       {(isCreateModalOpen || isEditModalOpen) && (
         <ModalForm
-          title={isEditModalOpen ? "Edit Approver" : "Create New Approver"}
+          title={isEditModalOpen ? "Update Approver" : "New Approver"}
+          isEditMode={isEditModalOpen}
           formData={formData}
           handleChange={handleChange}
           onCancel={() => {
@@ -216,10 +237,10 @@ const ApproverListModal = ({ onClose }) => {
   );
 };
 
-// Modal Form Component
-const ModalForm = ({ title, formData, handleChange, onCancel, onSubmit }) => (
-  <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center p-4 z-50 overflow-auto">
-    <div className="relative bg-gradient-to-br from-gray-50 via-white to-gray-100 rounded-2xl shadow-2xl p-6 w-full max-w-md">
+// Modal Form Component (unchanged)
+const ModalForm = ({ title, isEditMode, formData, handleChange, onCancel, onSubmit }) => (
+  <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center p-4 z-50 overflow-auto">
+    <div className="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md border border-gray-200">
       <h3 className="text-xl font-bold text-[#1a365d] mb-6">{title}</h3>
       <div className="space-y-4">
         {["name", "email", "level", "country"].map((field) => (
@@ -250,7 +271,7 @@ const ModalForm = ({ title, formData, handleChange, onCancel, onSubmit }) => (
           onClick={onSubmit}
           className="bg-[#1a365d] hover:bg-[#153052] text-white px-4 py-2 rounded-xl font-semibold transition-all duration-200"
         >
-          {title.includes("Edit") ? "Update" : "Create"}
+          {isEditMode ? "Update" : "Create"}
         </button>
       </div>
     </div>

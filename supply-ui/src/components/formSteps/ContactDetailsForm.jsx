@@ -31,9 +31,18 @@ const ContactDetailsForm = ({
   return (
     <Card className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200">
       <CardHeader>
-        <h2 className="text-2xl font-bold text-[#1a365d] tracking-tight">
-          2. Contact Details
-        </h2>
+        <div className="!bg-gradient-to-r from-[#2b4d8a] via-[#3e6ab3] to-[#2b4d8a] px-4 py-1 border-b-4 border-blue-500 rounded-lg">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-xl bg-blue-500 flex items-center justify-center shadow">
+            <span className="text-white font-bold text-base">2</span>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-white ">
+              Contact Details
+            </h2>
+          </div>
+        </div>
+      </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-x-8 gap-y-4">

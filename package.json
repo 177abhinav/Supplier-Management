@@ -28,7 +28,7 @@
     "cors": "^2.8.5",
     "cssesc": "^3.0.0",
     "detect-libc": "^2.1.0",
-    "dotenv": "^17.2.2",
+    "dotenv": "^17.2.3",
     "electron-to-chromium": "^1.5.221",
     "enhanced-resolve": "^5.18.3",
     "escalade": "^3.2.0",

@@ -1,3 +1,4 @@
+ //src/components/SuppliersListPage.jsx
 import React, { useState, useEffect } from "react";
 import SupplierDetailModal from "./SupplierDetailModal";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ const SuppliersListPage = () => {
 
   // Fetch suppliers or fallback to dummy data
   useEffect(() => {
+    setLoading(true); 
     const fetchSuppliers = async () => {
       try {
         const response = await fetch("http://localhost:8080/api/suppliers");
@@ -86,21 +88,21 @@ const SuppliersListPage = () => {
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1a365d] mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading suppliers...</p>
-        </div>
+ if (loading) {
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-gray-600 font-medium">Loading suppliers...</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gray-100 pt-0">
       <div className="container mx-auto px-4">
-        {/* Back Button + Title */}
+       
         <div className="mb-4 flex flex-wrap items-center gap-4">
           <button
             onClick={() => {
@@ -117,19 +119,32 @@ const SuppliersListPage = () => {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
-            
+            Back to Home
           </button>
+        </div>
 
-          <div className="flex flex-col">
-            <h1 className="text-4xl font-extrabold tracking-tight text-[#1a365d]">Suppliers</h1>
-            <div className="w-24 h-1 bg-[#1a365d] rounded-full mt-1"></div>
+        
+        <div className="
+          !bg-gradient-to-r from-[#2b4d8a] via-[#3e6ab3] to-[#2b4d8a]
+          px-6 py-2
+          border-b-4 border-blue-500
+          rounded-lg
+          mb-6
+          shadow-sm
+        ">
+          <div className="flex items-center gap-3">
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">
+                Suppliers
+              </h1>
+            </div>
           </div>
         </div>
 
-        {/* Filters Card */}
-        <div className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200 p-6 mb-6">
+        
+        <div className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200 p-3 mb-5">
           <div className="flex flex-wrap items-end gap-5">
-            {/* Supplier Name */}
+          
             <div className="flex-1 min-w-[240px] group">
               <label className="block text-sm font-semibold text-[#1a365d] mb-2">Supplier Name</label>
               <input
@@ -141,7 +156,7 @@ const SuppliersListPage = () => {
               />
             </div>
 
-            {/* City */}
+      
             <div className="flex-1 min-w-[240px] group">
               <label className="block text-sm font-semibold text-[#1a365d] mb-2">City</label>
               <input
@@ -153,7 +168,7 @@ const SuppliersListPage = () => {
               />
             </div>
 
-            {/* Status */}
+            
             <div className="flex-1 min-w-[240px] group">
               <label className="block text-sm font-semibold text-[#1a365d] mb-2">Status</label>
               <select
@@ -171,7 +186,7 @@ const SuppliersListPage = () => {
             <div className="shrink-0">
               <button
                 onClick={handleClearFilters}
-                className="px-6 py-4 bg-[#1a365d] hover:bg-[#152c4a] text-white text-sm font-medium rounded-xl flex items-center transition-colors duration-200 shadow-md"
+                className="px-5 py-3 bg-[#1a365d] hover:bg-[#152c4a] text-white text-sm font-medium rounded-xl flex items-center transition-colors duration-200 shadow-md"
               >
                 Clear Filters
               </button>
@@ -179,10 +194,8 @@ const SuppliersListPage = () => {
           </div>
         </div>
 
-        {/* Table Card */}
+        
         <div className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 shadow-md rounded-xl border border-gray-200 overflow-hidden">
-          
-
           {filteredSuppliers.length === 0 ? (
             <div className="py-20 text-center">
               <h3 className="text-xl font-semibold text-gray-700">No suppliers found</h3>
@@ -190,10 +203,10 @@ const SuppliersListPage = () => {
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full">
-                <thead className="bg-[#1a365d]">
+                <thead className=" !bg-gradient-to-r from-[#2b4d8a] via-[#3e6ab3] to-[#2b4d8a]">
                   <tr>
                     {["Supplier Name", "Contact", "Email", "City", "Status", "Actions"].map((header, idx) => (
-                      <th key={idx} className="px-8 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">{header}</th>
+                      <th key={idx} className="px-8 py-2.5 text-left text-sm font-bold text-white uppercase tracking-wider">{header}</th>
                     ))}
                   </tr>
                 </thead>
@@ -229,4 +242,4 @@ const SuppliersListPage = () => {
   );
 };
 
-export default SuppliersListPage;
+export default SuppliersListPage; 
